@@ -1,5 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 using OSManager.Core.Packages;
+
+AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
+Console.WriteLine($"Version {assembly.Version}");
 
 if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 {
