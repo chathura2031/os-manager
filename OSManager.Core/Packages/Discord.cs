@@ -9,8 +9,7 @@ public class Discord: Package
 
     protected override void Install(int verbosity)
     {
-        // TODO: Uncomment this
-        // base.Install(verbosity);
+        base.Install(verbosity);
         
         // Download the debian package
         if (verbosity > 0)
@@ -28,5 +27,11 @@ public class Discord: Package
             Console.WriteLine("Deleting debian package...");
         }
         File.Delete(filePath);
+    }
+
+    protected override void Configure(int verbosity)
+    {
+        // No configuration required
+        // base.Configure(verbosity);
     }
 }
