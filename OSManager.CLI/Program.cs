@@ -1,3 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using System.Runtime.InteropServices;
+using OSManager.Core.Packages;
 
-Console.WriteLine("Hello, World!");
+if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+{
+    throw new SystemException("This program is only supported on Linux.");
+}
+
+Discord.Instance.InstallAndConfigure(1);
