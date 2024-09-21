@@ -10,4 +10,4 @@ if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     throw new SystemException("This program is only supported on Linux.");
 }
 
-Discord.Instance.InstallAndConfigure(1);
+Vim.Instance.InstallAndConfigure(1);
