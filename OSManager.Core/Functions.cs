@@ -4,7 +4,7 @@ namespace OSManager.Core;
 
 public static class Functions
 {
-    public static void RunCommand(string fileName, string arguments)
+    public static int RunCommand(string fileName, string arguments)
     {
         ProcessStartInfo startInfo = new ProcessStartInfo()
         {
@@ -40,6 +40,8 @@ public static class Functions
         }
         
         process.WaitForExit();
+        
+        return process.ExitCode;
     }
     
     public static string DownloadFromUrl(string url, string fileName, string? downloadDirectory = null)
