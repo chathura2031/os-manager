@@ -37,7 +37,7 @@ public class Chrome: Package
         int statusCode = Functions.RunFunctions([
             new(() => base.Install(verbosity)),
             new(() => DownloadPackage(verbosity, out filePath), "Failed to download debian file"),
-            // TODO: Install chrome
+            new(() => Functions.RunCommand("/usr/bin/sudo", $"apt install -y --fix-broken {filePath}"), "Failed to install debian file"),
             new(() => DeletePackage(verbosity, filePath), "Failed to delete debian file")
         ]);
 
