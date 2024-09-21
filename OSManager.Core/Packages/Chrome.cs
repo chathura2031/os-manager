@@ -1,11 +1,11 @@
 namespace OSManager.Core.Packages;
 
-public class Discord: Package
+public class Chrome: Package
 {
-    public static readonly Discord Instance = new();
-    public override string Name { get; protected set; } = "Discord";
+    public static readonly Chrome Instance = new();
+    public override string Name { get; protected set; } = "Google Chrome";
 
-    private Discord() { }
+    private Chrome() { }
 
     private int DownloadPackage(int verbosity, out string filePath)
     {
@@ -14,9 +14,7 @@ public class Discord: Package
         {
             Console.WriteLine("Downloading debian package...");
         }
-
-        int statusCode = Functions.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{Name}.deb", out filePath);
+        int statusCode = Functions.DownloadFromUrl("https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", $"{Name}.deb", out filePath);
 
         return statusCode;
     }
@@ -32,14 +30,14 @@ public class Discord: Package
 
         return 0;
     }
-
+    
     protected override int Install(int verbosity)
     {
         string filePath = "";
         int statusCode = Functions.RunFunctions([
             new(() => base.Install(verbosity)),
             new(() => DownloadPackage(verbosity, out filePath), "Failed to download debian file"),
-            new(() => Functions.RunCommand("/usr/bin/sudo", $"apt install -y --fix-broken {filePath}"), "Failed to install debian file"),
+            // TODO: Install chrome
             new(() => DeletePackage(verbosity, filePath), "Failed to delete debian file")
         ]);
 
@@ -48,7 +46,8 @@ public class Discord: Package
 
     protected override void Configure(int verbosity)
     {
-        // No configuration required
-        // base.Configure(verbosity);
+        base.Configure(verbosity);
+
+        string homeDir = "";
     }
 }

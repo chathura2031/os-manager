@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "OSManager.CLI/1.0.0": {
+        "dependencies": {
+          "OSManager.Core": "1.0.0"
+        },
+        "runtime": {
+          "OSManager.CLI.dll": {}
+        }
+      },
+      "OSManager.Core/1.0.0": {
+        "runtime": {
+          "OSManager.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "OSManager.CLI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OSManager.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
