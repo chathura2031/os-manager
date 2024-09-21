@@ -41,6 +41,14 @@ public abstract class Package
             Console.WriteLine($"Configuring {Name}...");
         }
     }
+
+    protected virtual void BackupConfiguration(int verbosity)
+    {
+        if (verbosity > 0)
+        {
+            Console.WriteLine($"Backing up configuration for {Name}...");
+        }
+    }
     
     // TODO: Add rollback function -- say something like "One or more errors were detected during installation, do you want to rollback or proceed to configuration?"
 }
