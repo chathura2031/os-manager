@@ -5,6 +5,8 @@ public class Discord: Package
     public static readonly Discord Instance = new();
     public override string Name { get; } = "Discord";
 
+    public override string SafeName { get; } = "discord";
+
     private Discord() { }
 
     private int DownloadPackage(int verbosity, out string filePath)
@@ -16,7 +18,7 @@ public class Discord: Package
         }
 
         int statusCode = Functions.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{Name}.deb", out filePath);
+            $"{SafeName}.deb", out filePath);
 
         return statusCode;
     }

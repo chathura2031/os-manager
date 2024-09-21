@@ -3,6 +3,7 @@ namespace OSManager.Core;
 public abstract class Package
 {
     public virtual string Name { get; }
+    public virtual string SafeName { get; }
     // public virtual Package[] Dependencies { get; }
 
     public virtual int InstallAndConfigure(int verbosity = 0)
@@ -47,12 +48,14 @@ public abstract class Package
         return 0;
     }
 
-    protected virtual void BackupConfiguration(int verbosity)
+    protected virtual int BackupConfiguration(int verbosity)
     {
         if (verbosity > 0)
         {
             Console.WriteLine($"Backing up configuration for {Name}...");
         }
+
+        return 0;
     }
     
     // TODO: Add rollback function -- say something like "One or more errors were detected during installation, do you want to rollback or proceed to configuration?"

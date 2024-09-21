@@ -5,6 +5,8 @@ public class Chrome: Package
     public static readonly Chrome Instance = new();
     public override string Name { get; } = "Google Chrome";
 
+    public override string SafeName { get; } = "google-chrome";
+
     private Chrome() { }
 
     private int DownloadPackage(int verbosity, out string filePath)
@@ -14,7 +16,7 @@ public class Chrome: Package
         {
             Console.WriteLine("Downloading debian package...");
         }
-        int statusCode = Functions.DownloadFromUrl("https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", $"{Name}.deb", out filePath);
+        int statusCode = Functions.DownloadFromUrl("https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", $"{SafeName}.deb", out filePath);
 
         return statusCode;
     }

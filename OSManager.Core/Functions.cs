@@ -83,7 +83,7 @@ public static class Functions
         filePath = Path.Join(downloadDirectory, fileName);
         bool cancelOperation = false;
         
-        if (File.Exists(filePath))
+        if (promptReplacement && File.Exists(filePath))
         {
             cancelOperation = !ShowYesOrNoPrompt($"{filePath} already exists. Would you like to replace it?");
         }
@@ -96,6 +96,45 @@ public static class Functions
             using Task<Stream> stream = client.GetStreamAsync(url);
             using FileStream fs = new(filePath, FileMode.CreateNew);
             stream.Result.CopyTo(fs);
+        }
+
+        return cancelOperation ? 1 : 0;
+    }
+    
+    /// <summary>
+    /// Copy a file to a new directory
+    /// </summary>
+    /// <param name="sourcePath">The path to the file to copy</param>
+    /// <param name="destinationPath">The path to the file at the destination</param>
+    /// <param name="promptReplacement">True if a prompt should be shown if the file already exists, False to replace it without a prompt</param>
+    /// <returns></returns>
+    public static int CopyFile(string sourcePath, string destinationPath, bool promptReplacement = false)
+    {
+        if (!File.Exists(sourcePath))
+        {
+            Console.WriteLine($"{sourcePath} does not exist");
+            return 1;
+        }
+
+        bool cancelOperation = false;
+        if (promptReplacement && File.Exists(destinationPath))
+        {
+            cancelOperation = !Functions.ShowYesOrNoPrompt($"{destinationPath} already exists. Would you like to replace it?");
+        }
+
+        if (!cancelOperation)
+        {
+            File.Delete(destinationPath);
+            
+            try
+            {
+                File.Copy(sourcePath, destinationPath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return 1;
+            }
         }
 
         return cancelOperation ? 1 : 0;
