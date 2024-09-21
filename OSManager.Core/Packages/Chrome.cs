@@ -3,7 +3,7 @@ namespace OSManager.Core.Packages;
 public class Chrome: Package
 {
     public static readonly Chrome Instance = new();
-    public override string Name { get; protected set; } = "Google Chrome";
+    public override string Name { get; } = "Google Chrome";
 
     private Chrome() { }
 
@@ -43,11 +43,13 @@ public class Chrome: Package
 
         return statusCode;
     }
-
-    protected override void Configure(int verbosity)
+    
+    protected override int Configure(int verbosity)
     {
-        base.Configure(verbosity);
+        int statusCode = Functions.RunFunctions([
+            new(() => base.Configure(verbosity))
+        ]);
 
-        string homeDir = "";
+        return statusCode;
     }
 }

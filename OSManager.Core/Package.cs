@@ -2,14 +2,17 @@ namespace OSManager.Core;
 
 public abstract class Package
 {
-    public virtual string Name { get; protected set; }
-    public virtual Package[] Dependencies { get; protected set; }
+    public virtual string Name { get; }
+    // public virtual Package[] Dependencies { get; }
 
-    public virtual void InstallAndConfigure(int verbosity = 0)
+    public virtual int InstallAndConfigure(int verbosity = 0)
     {
-        Install(verbosity);
-        
-        Configure(verbosity);
+        int statusCode = Functions.RunFunctions([
+            new(() => Install(verbosity)),
+            new (() => Configure(verbosity))
+        ]);
+
+        return statusCode;
     }
 
     protected virtual int Install(int verbosity)
@@ -34,12 +37,14 @@ public abstract class Package
         return 0;
     }
 
-    protected virtual void Configure(int verbosity)
+    protected virtual int Configure(int verbosity)
     {
         if (verbosity > 0)
         {
             Console.WriteLine($"Configuring {Name}...");
         }
+
+        return 0;
     }
 
     protected virtual void BackupConfiguration(int verbosity)

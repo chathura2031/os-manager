@@ -3,7 +3,7 @@ namespace OSManager.Core.Packages;
 public class Discord: Package
 {
     public static readonly Discord Instance = new();
-    public override string Name { get; protected set; } = "Discord";
+    public override string Name { get; } = "Discord";
 
     private Discord() { }
 
@@ -46,9 +46,10 @@ public class Discord: Package
         return statusCode;
     }
 
-    protected override void Configure(int verbosity)
+    protected override int Configure(int verbosity)
     {
         // No configuration required
         // base.Configure(verbosity);
+        return 0;
     }
 }
