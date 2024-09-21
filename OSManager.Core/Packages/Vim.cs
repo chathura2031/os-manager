@@ -109,5 +109,7 @@ public sealed class Vim: Package
             new(() => base.BackupConfiguration(verbosity)),
             new(() => CopyConfigFile(verbosity))
         ]);
+
+        return statusCode;
     }
 }
