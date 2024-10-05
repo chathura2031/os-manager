@@ -4,7 +4,7 @@ public interface IPackage
 {
     string Name { get; }
     
-    string MachineName { get; }
+    string PathSafeName { get; }
     
     HashSet<IPackage> Dependencies { get; }
     

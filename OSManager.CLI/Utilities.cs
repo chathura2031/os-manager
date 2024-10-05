@@ -2,7 +2,7 @@ namespace OSManager.CLI;
 
 public static class Utilities
 {
-    public static string SlavePath { get; set; }
+    public static string SlavePath { get; set; } = null!;
     
     /// <summary>
     /// Prompt the user for a yes or no answer
@@ -57,5 +57,13 @@ public static class Utilities
         }
 
         return cancelOperation ? 1 : 0;
+    }
+
+    public static void RunInReverse(Action[] actions)
+    {
+        for (int i = actions.Length - 1; i >= 0; i--)
+        {
+            actions[0]();
+        }
     }
 }

@@ -96,4 +96,29 @@ public class StackManager
         lines = [count.ToString(), content];
         File.WriteAllLines(Path, lines);
     }
+
+    /// <summary>
+    /// Push a bash command to the stack
+    /// </summary>
+    /// <param name="command">The bash command to add to the stack</param>
+    public void PushBashCommand(string command)
+    {
+        Push($"{command} && ./{Utilities.SlavePath} popstack --stack {Path} --count 1");
+    }
+
+    /// <summary>
+    /// Push a bash command to execute a specific stage of this project
+    /// </summary>
+    /// <param name="stage">The installation stage to run</param>
+    /// <param name="pathSafeName">The package's path safe name</param>
+    /// <param name="dataPath">The path to any data required (optional)</param>
+    public void PushNextStage(int stage, string pathSafeName, string? dataPath = null)
+    {
+        string content = $"./{Utilities.SlavePath} continue --stack {Path} --slave {Utilities.SlavePath} --stage {stage} --package {pathSafeName}";
+        if (dataPath != null)
+        {
+            content += $" --data {dataPath}";
+        }
+        Push(content);
+    }
 }

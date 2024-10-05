@@ -6,7 +6,7 @@ public class Discord : IPackage
     
     public string Name { get; } = "Discord";
 
-    public string MachineName { get; } = "discord";
+    public string PathSafeName { get; } = "discord";
 
     public HashSet<IPackage> Dependencies { get; } = [];
     
@@ -21,7 +21,7 @@ public class Discord : IPackage
         }
 
         int statusCode = Utilities.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{MachineName}.deb", out filePath);
+            $"{PathSafeName}.deb", out filePath);
 
         return statusCode;
     }
@@ -43,7 +43,7 @@ public class Discord : IPackage
         switch (stage)
         {
             case 0:
-                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 1 --package {MachineName}");
+                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 1 --package {PathSafeName}");
                 this.InstallDependencies();
                 break;
             case 1:
@@ -54,12 +54,12 @@ public class Discord : IPackage
                     throw new Exception("Failed something.. idk TODO");
                 }
                 
-                // TODO: Add pop option?? otherwise gets stuck on stack
-                // TODO: Write function to add to stack in reverse
                 // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
                 // TODO: Convert the data field to a path to a file
-                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 2 --package {MachineName} --data {filePath}");
-                StackManager.Instance.Push($"sudo apt install -y --fix-broken {filePath} && ./{Utilities.SlavePath} popstack --stack {StackManager.Instance.Path} --count 1");
+                Utilities.RunInReverse([
+                    () => StackManager.Instance.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
+                    () => StackManager.Instance.PushNextStage(2,PathSafeName, filePath),
+                ]);
                 break;
             case 2:
                 DeletePackage(2, (string)data!);
