@@ -16,11 +16,6 @@ if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 // Chrome.Instance.Backup(0);
 // Discord.Instance.InstallAndConfigure(1);
 
-// Parser.Default.ParseArguments<InitOptions, StageOptions>(args).MapResult(
-//     (InitOptions options) => Init(options),
-//     errs => 1
-// );
-
 return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, ContinueOptions, FinaliseOptions, PopStackOptions>(args)
     .MapResult(
         (InitialiseOptions opts) => Initialise(opts),
