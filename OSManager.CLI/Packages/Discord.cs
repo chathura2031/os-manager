@@ -58,7 +58,7 @@ public class Discord : IPackage
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
                     () => StackManager.Instance.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
-                    () => StackManager.Instance.PushNextStage(2,PathSafeName, filePath),
+                    () => StackManager.Instance.PushNextStage(2, PathSafeName, filePath),
                 ]);
                 break;
             case 2:

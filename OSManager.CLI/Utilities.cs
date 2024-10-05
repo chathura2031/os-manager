@@ -63,7 +63,7 @@ public static class Utilities
     {
         for (int i = actions.Length - 1; i >= 0; i--)
         {
-            actions[0]();
+            actions[i]();
         }
     }
 }
