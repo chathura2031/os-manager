@@ -42,7 +42,6 @@ manager="OSManager.CLI/bin/Debug/net8.0/OSManager.CLI"
 is_stack_empty
 while [[ $? == 0 ]] ; do
     command=$(get_next_command)
-    echo $command
     eval $command
 
     is_stack_empty
