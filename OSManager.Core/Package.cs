@@ -16,6 +16,15 @@ public abstract class Package
         return statusCode;
     }
 
+    public virtual int Backup(int verbosity = 0)
+    {
+        int statusCode = Functions.RunFunctions([
+            new(() => BackupConfiguration(verbosity))
+        ]);
+        
+        return statusCode;
+    }
+
     protected virtual int Install(int verbosity)
     {
         if (verbosity > 0)

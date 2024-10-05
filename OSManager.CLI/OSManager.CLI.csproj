@@ -7,10 +7,15 @@
         <Nullable>enable</Nullable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Deterministic>false</Deterministic>
+        <AssemblyVersion>1.0.*</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\OSManager.Core\OSManager.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
     </ItemGroup>
 
 </Project>

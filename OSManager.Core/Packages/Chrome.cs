@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace OSManager.Core.Packages;
 
 public class Chrome: Package
@@ -53,5 +55,34 @@ public class Chrome: Package
         ]);
 
         return statusCode;
+    }
+
+    protected override int BackupConfiguration(int verbosity)
+    {
+        base.BackupConfiguration(verbosity);
+
+        // TODO: Convert to functions with return codes
+        string sourcePath = Path.Join(Functions.ConfigDirectory, "google-chrome");
+        // TODO: Repeat for all profiles
+        string profileSourcePath = Path.Join(sourcePath, "Profile 1");
+
+        string encryptedTargetPath = Path.Join(Functions.EncryptedBackupDirectory, "chrome");
+        string encryptedProfileTargetPath = Path.Join(encryptedTargetPath, "Profile 1");
+        
+        // Backup profile metadata
+        Functions.CopyFile(Path.Join(sourcePath, "Local State"), Path.Join(encryptedTargetPath, "Local State"));
+        
+        // Backup extension data
+        Functions.CopyFile(Path.Join(profileSourcePath, "Preferences"), Path.Join(encryptedProfileTargetPath, "Preferences"));
+        Functions.CopyDirectory(Path.Join(profileSourcePath, "Extensions"), Path.Join(encryptedProfileTargetPath, "Extensions"));
+        Functions.CopyDirectory(Path.Join(profileSourcePath, "Local Extension Settings"), Path.Join(encryptedProfileTargetPath, "Local Extension Settings"));
+        Functions.CopyDirectory(Path.Join(profileSourcePath, "Managed Extension Settings"), Path.Join(encryptedProfileTargetPath, "Managed Extension Settings"));
+
+        // TODO: Read in and store the important parts of the preferences file
+        // Functions.CopyDirectory(sourcePath, Path.Join(Functions.EncryptedBackupDirectory, "google-chrome"));
+        // JObject o1 = JObject.Parse(File.ReadAllText(Path.Join(sourcePath, "Local State")));
+        // JObject o2 = JObject.Parse(File.ReadAllText(Path.Join(profileSourcePath, "Preferences")));
+        
+        return 0;
     }
 }

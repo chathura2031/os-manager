@@ -1,0 +1,51 @@
+#!/bin/bash
+
+get_next_command() {
+    command=$(cat $stack_path | tail -n 1)
+    echo $command
+}
+
+is_stack_empty() {
+    command=$(get_next_command)
+    if [[ $command == "" ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+# The minimum amount of RAM (in KB) required to store the next command to run
+# NOTE: A non-empty text file with only ASCII characters using UTF-8 will use n+1 bytes where n is the number of characters
+min_ram_req=50 # TODO: Figure out a value for this
+
+# Get the amount of unallocated space in RAM (in KB)
+ram_unallocated=($(df /dev/shm/ | tail -n 1))
+ram_unallocated=${ram_unallocated[3]}
+
+# Figure out whether to store in memory or on disk
+stack_path=""
+if [[ $ram_unallocated > $min_ram_req ]]; then
+    stack_path="/dev/shm/"
+else
+    stack_path="/tmp/"
+fi
+
+# Get a new path to the stack head
+stack_id=$(uuidgen)
+stack_path=$stack_path"osman-"$stack_id".cli"
+
+# Run the manager UI
+manager="OSManager.CLI/bin/Debug/net8.0/OSManager.CLI"
+./$manager initialise --stack $stack_path --slave $manager
+
+# Run any subsequent commands
+is_stack_empty
+while [[ $? == 0 ]] ; do
+    command=$(get_next_command)
+    echo $command
+    eval $command
+
+    is_stack_empty
+done
+
+./$manager finalise --stack $stack_path

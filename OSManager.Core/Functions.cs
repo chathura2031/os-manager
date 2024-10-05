@@ -4,6 +4,14 @@ namespace OSManager.Core;
 
 public static class Functions
 {
+    public static string HomeDirectory { get; } = Environment.GetEnvironmentVariable("HOME") ?? "";
+    
+    public static string ConfigDirectory { get; } = Path.Join(HomeDirectory, ".config");
+
+    public static string BackupDirectory { get; } = Path.Join(HomeDirectory, "Projects/os-management");
+    
+    public static string EncryptedBackupDirectory { get; } = Path.Join(HomeDirectory, "Projects/os-setup-secrets");
+    
     /// <summary>
     /// Run a command
     /// </summary>
@@ -100,14 +108,13 @@ public static class Functions
 
         return cancelOperation ? 1 : 0;
     }
-    
-    /// <summary>
-    /// Copy a file to a new directory
+
+    /// Copy a file to a new location
     /// </summary>
     /// <param name="sourcePath">The path to the file to copy</param>
     /// <param name="destinationPath">The path to the file at the destination</param>
     /// <param name="promptReplacement">True if a prompt should be shown if the file already exists, False to replace it without a prompt</param>
-    /// <returns></returns>
+    /// <returns>A status code</returns>
     public static int CopyFile(string sourcePath, string destinationPath, bool promptReplacement = false)
     {
         if (!File.Exists(sourcePath))
@@ -124,10 +131,17 @@ public static class Functions
 
         if (!cancelOperation)
         {
-            File.Delete(destinationPath);
+            if (File.Exists(destinationPath))
+            {
+                File.Delete(destinationPath);
+            }
             
             try
             {
+                // Create the parent destination directory if it doesn't exist
+                string? parentDir = (string)Path.GetDirectoryName(destinationPath)!;
+                Directory.CreateDirectory(parentDir);
+                // Copy the file
                 File.Copy(sourcePath, destinationPath);
             }
             catch (Exception e)
@@ -138,6 +152,59 @@ public static class Functions
         }
 
         return cancelOperation ? 1 : 0;
+    }
+    
+    /// <summary>
+    /// Copy a directory to a new location and if specified, subdirectories
+    /// </summary>
+    /// <param name="sourcePath">The path to the directory to copy</param>
+    /// <param name="destinationPath">The path to the directory at the destination</param>
+    /// <param name="promptReplacement">True if a prompt should be shown if the file already exists, False to replace it without a prompt</param>
+    /// <returns>A status code</returns>
+    public static int CopyDirectory(string sourcePath, string destinationPath, bool promptReplacement = false)
+    {
+        // Get information about the source directory
+        var dir = new DirectoryInfo(sourcePath);
+
+        // Check if the source directory exists
+        if (!dir.Exists)
+        {
+            Console.WriteLine($"{sourcePath} does not exist");
+            return 1;
+        }
+
+        // Cache directories before we start copying
+        DirectoryInfo[] dirs = dir.GetDirectories();
+
+        // Create the destination directory
+        Directory.CreateDirectory(destinationPath);
+
+        // Get the files in the source directory and copy to the destination directory
+        foreach (FileInfo file in dir.GetFiles())
+        {
+            string targetFilePath = Path.Join(destinationPath, file.Name);
+            CopyFile(file.FullName, targetFilePath, promptReplacement);
+        }
+
+        // TODO: Implement this iteratively
+        // If recursive and copying subdirectories, recursively call this method
+        foreach (DirectoryInfo subDir in dirs)
+        {
+            bool cancelOperation = false;
+            string newDestinationDir = Path.Join(destinationPath, subDir.Name);
+            
+            if (promptReplacement && File.Exists(newDestinationDir))
+            {
+                cancelOperation = !Functions.ShowYesOrNoPrompt($"{newDestinationDir} already exists. Would you like to replace it?");
+            }
+
+            if (!cancelOperation)
+            {
+                CopyDirectory(subDir.FullName, newDestinationDir, promptReplacement);
+            }
+        }
+
+        return 0;
     }
     
     /// <summary>
