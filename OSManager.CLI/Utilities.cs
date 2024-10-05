@@ -2,6 +2,8 @@ namespace OSManager.CLI;
 
 public static class Utilities
 {
+    public static string SlavePath { get; set; }
+    
     /// <summary>
     /// Prompt the user for a yes or no answer
     /// </summary>

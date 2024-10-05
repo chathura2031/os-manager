@@ -4,9 +4,6 @@ public class StackManager
 {
     public static StackManager Instance { get; set; }
     
-    // TODO: Move this somewhere else central
-    public static string SlavePath { get; set; }
-
     public string Path { get; set; }
 
     public int Count => int.Parse(File.ReadAllLines(Path)[0]);
@@ -14,20 +11,18 @@ public class StackManager
     public StackManager(string path, bool newStack = true)
     {
         Path = path;
-        // Create an empty with an empty command for the next execution
+        // Create an empty stack
         if (!File.Exists(Path) || newStack)
         {
             File.WriteAllLines(Path, ["0", ""]);
         }
     }
 
-    // private void ModifyStackCount(int count)
-    // {
-    //     string[] lines = File.ReadAllLines(Path);
-    //     lines[0] = count.ToString();
-    //     File.WriteAllLines(Path, lines);
-    // }
-
+    /// <summary>
+    /// View the content at the top of the stack without popping it
+    /// </summary>
+    /// <param name="count">A variable to store the current stack count</param>
+    /// <returns>The content at the top of the stack</returns>
     private string? Peek(out int count)
     {
         count = Count;
@@ -39,17 +34,27 @@ public class StackManager
         return File.ReadAllLines(Path)[1];
     }
 
-    private string? Peek()
+    /// <summary>
+    /// View the content at the top of the stack without popping it
+    /// </summary>
+    /// <returns>The content at the top of the stack</returns>
+    public string? Peek()
     {
         return Peek(out _);
     }
 
+    /// <summary>
+    /// Reset the stack head
+    /// </summary>
     private void ResetHead()
     {
         File.WriteAllLines(Path, ["0", string.Empty]);
     }
 
-    // TODO: Redo stack manager
+    /// <summary>
+    /// Pop the item at the top of the stack
+    /// </summary>
+    /// <returns>The content that was at the top of the stack</returns>
     public string? Pop()
     {
         string? content = Peek(out int count);
@@ -72,6 +77,10 @@ public class StackManager
         return content;
     }
 
+    /// <summary>
+    /// Push content to the stack
+    /// </summary>
+    /// <param name="content">The content to add to the stack</param>
     public void Push(string content)
     {
         string[] lines = File.ReadAllLines(Path);

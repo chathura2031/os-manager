@@ -36,7 +36,7 @@ int Initialise(InitialiseOptions options)
 
     // TODO: Adjust for the case when the location is on disk
     // TODO: Refactor so this doesn't have to be defined all the time
-    StackManager.SlavePath = options.SlavePath;
+    Utilities.SlavePath = options.SlavePath;
     // Create a file to keep track of the stack size
     StackManager.Instance = new StackManager(options.StackPath);
 
@@ -57,7 +57,7 @@ int Initialise(InitialiseOptions options)
 int GotoStep(ContinueOptions options)
 {
     // TODO: Refactor so this doesn't have to be defined all the time
-    StackManager.SlavePath = options.SlavePath;
+    Utilities.SlavePath = options.SlavePath;
     StackManager.Instance = new StackManager(options.StackPath, false);
     StackManager.Instance.Pop();
     

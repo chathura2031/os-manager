@@ -40,11 +40,10 @@ public class Discord : IPackage
 
     public void Install(int stage, string? data)
     {
-        // TODO: Consume the current execution??
         switch (stage)
         {
             case 0:
-                StackManager.Instance.Push($"./{StackManager.SlavePath} continue --stack {StackManager.Instance.Path} --slave {StackManager.SlavePath} --stage 1 --package {MachineName}");
+                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 1 --package {MachineName}");
                 this.InstallDependencies();
                 break;
             case 1:
@@ -59,8 +58,8 @@ public class Discord : IPackage
                 // TODO: Write function to add to stack in reverse
                 // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
                 // TODO: Convert the data field to a path to a file
-                StackManager.Instance.Push($"./{StackManager.SlavePath} continue --stack {StackManager.Instance.Path} --slave {StackManager.SlavePath} --stage 2 --package {MachineName} --data {filePath}");
-                StackManager.Instance.Push($"sudo apt install -y --fix-broken {filePath} && ./{StackManager.SlavePath} popstack --stack {StackManager.Instance.Path} --count 1");
+                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 2 --package {MachineName} --data {filePath}");
+                StackManager.Instance.Push($"sudo apt install -y --fix-broken {filePath} && ./{Utilities.SlavePath} popstack --stack {StackManager.Instance.Path} --count 1");
                 break;
             case 2:
                 DeletePackage(2, (string)data!);
