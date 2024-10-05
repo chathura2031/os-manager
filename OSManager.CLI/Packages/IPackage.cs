@@ -10,13 +10,14 @@ public interface IPackage
     
     HashSet<IPackage> OptionalExtras { get; }
 
-    public void Install(int stage, string data);
+    public int Install(int stage, string data);
 }
 
 public static class PackageExtensions
 {
-    public static void InstallDependencies(this IPackage package)
+    public static int InstallDependencies(this IPackage package)
     {
         // TODO: Check if the package is installed and if not, install the dependency
+        return 0;
     }
 }

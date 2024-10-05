@@ -38,34 +38,43 @@ public class Discord : IPackage
         return 0;
     }
 
-    public void Install(int stage, string? data)
+    public int Install(int stage, string? data)
     {
+        int statusCode = 0;
         switch (stage)
         {
             case 0:
-                StackManager.Instance.Push($"./{Utilities.SlavePath} continue --stack {StackManager.Instance.Path} --slave {Utilities.SlavePath} --stage 1 --package {PathSafeName}");
+                StackManager.Instance.PushNextStage(stage + 1, PathSafeName);
                 this.InstallDependencies();
                 break;
             case 1:
-                int statusCode = DownloadPackage(2, out string filePath);
+                statusCode = DownloadPackage(2, out string filePath);
                 // TODO
                 if (statusCode != 0)
                 {
-                    throw new Exception("Failed something.. idk TODO");
+                    Console.WriteLine("Failed to install debian file");
+                    return 1;
                 }
                 
                 // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
                     () => StackManager.Instance.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
-                    () => StackManager.Instance.PushNextStage(2, PathSafeName, filePath),
+                    () => StackManager.Instance.PushNextStage(stage + 1, PathSafeName, filePath),
                 ]);
                 break;
             case 2:
-                DeletePackage(2, (string)data!);
+                statusCode = DeletePackage(2, (string)data!);
+                if (statusCode != 0)
+                {
+                    Console.WriteLine("Failed to delete debian file");
+                    return 1;
+                }
                 break;
             default:
                 throw new ArgumentException($"{Name} does not have {stage} stages of installation.");
         }
+
+        return statusCode;
     }
 }
