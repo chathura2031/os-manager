@@ -14,6 +14,11 @@ is_stack_empty() {
     fi
 }
 
+terminate() {
+    ./$1 finalise --stack $2
+    exit $3
+}
+
 # The minimum amount of RAM (in KB) required to store the next command to run
 # NOTE: A non-empty text file with only ASCII characters using UTF-8 will use n+1 bytes where n is the number of characters
 min_ram_req=50 # TODO: Figure out a value for this
@@ -40,11 +45,19 @@ manager="OSManager.CLI/bin/Debug/net8.0/OSManager.CLI"
 
 # Run any subsequent commands
 is_stack_empty
+last_command=""
 while [[ $? == 0 ]] ; do
     command=$(get_next_command)
+
+    if [[ $last_command == $command ]]; then
+        echo "Something is wrong, recieved the same command twice. Exiting..."
+        terminate $manager $stack_path 1
+    fi
+
     eval $command
 
+    last_command=$command
     is_stack_empty
 done
 
-./$manager finalise --stack $stack_path
+terminate $manager $stack_path 0

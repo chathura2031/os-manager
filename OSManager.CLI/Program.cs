@@ -46,7 +46,7 @@ int Initialise(InitialiseOptions options)
             throw new ArgumentException("Received an invalid selection");
     }
     
-    return 1;
+    return 0;
 }
 
 int GotoStep(ContinueOptions options)
@@ -65,7 +65,8 @@ int GotoStep(ContinueOptions options)
         default:
             throw new ArgumentException("Received an invalid package");
     }
-    return 1;
+    
+    return 0;
 }
 
 int PopStack(PopStackOptions options)
@@ -76,20 +77,26 @@ int PopStack(PopStackOptions options)
         StackManager.Instance.Pop();
     }
     
-    return 1;
+    return 0;
 }
 
 int Finalise(FinaliseOptions options)
 {
     // TODO: Refactor so this doesn't have to be defined all the time
     StackManager.Instance = new StackManager(options.StackPath, false);
+    int statusCode = 0;
 
     if (StackManager.Instance.Count > 0)
     {
+#if debug
         throw new InvalidOperationException("Failed to terminate program, stack is not empty.");
+#else
+        Console.WriteLine("WARNING: Sudden termination of program, deleting stack.");
+        statusCode = 1;
+        StackManager.Instance.Clear();
+#endif
     }
     
     File.Delete(StackManager.Instance.Path);
-    
-    return 1;
+    return statusCode;
 }

@@ -49,10 +49,10 @@ public class Discord : IPackage
                 break;
             case 1:
                 statusCode = DownloadPackage(2, out string filePath);
-                // TODO
                 if (statusCode != 0)
                 {
-                    Console.WriteLine("Failed to install debian file");
+                    Console.WriteLine("Failed to download debian file");
+                    File.Delete(filePath);
                     return 1;
                 }
                 

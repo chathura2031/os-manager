@@ -78,6 +78,19 @@ public class StackManager
     }
 
     /// <summary>
+    /// Clear the whole stack
+    /// </summary>
+    public void Clear()
+    {
+        int count = Count;
+        for (int i = 0; i < count - 1; i++)
+        {
+            File.Delete($"{Path}.{i}");
+        }
+        ResetHead();
+    }
+
+    /// <summary>
     /// Push content to the stack
     /// </summary>
     /// <param name="content">The content to add to the stack</param>

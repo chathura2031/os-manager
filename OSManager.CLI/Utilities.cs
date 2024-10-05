@@ -53,7 +53,15 @@ public static class Utilities
             using HttpClient client = new();
             using Task<Stream> stream = client.GetStreamAsync(url);
             using FileStream fs = new(filePath, FileMode.CreateNew);
-            stream.Result.CopyTo(fs);
+            try
+            {
+                stream.Result.CopyTo(fs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to download file from {url}");
+                return 1;
+            }
         }
 
         return cancelOperation ? 1 : 0;
