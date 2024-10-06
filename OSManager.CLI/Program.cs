@@ -16,11 +16,12 @@ if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 // Chrome.Instance.Backup(0);
 // Discord.Instance.InstallAndConfigure(1);
 
-return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, ContinueOptions, FinaliseOptions, PopStackOptions>(args)
+return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, ContinueOptions, FinaliseOptions, PushStackOptions, PopStackOptions>(args)
     .MapResult(
         (InitialiseOptions opts) => Initialise(opts),
         (ContinueOptions opts) => GotoStep(opts),
         (FinaliseOptions opts) => Finalise(opts),
+        (PushStackOptions opts) => PushStack(opts),
         (PopStackOptions opts) => PopStack(opts),
         errs => 1);
 
@@ -70,23 +71,21 @@ int PopStack(PopStackOptions options)
     return 0;
 }
 
+int PushStack(PushStackOptions options)
+{
+    Utilities.GetOrCreateStacks(options.BaseStackPath);
+    string tmpNodePath = $"{Utilities.ProgramStack.Path}.tmp";
+    string content = File.ReadAllText(tmpNodePath);
+    Utilities.ProgramStack.Push(content);
+    File.Delete(tmpNodePath);
+    
+    return 0;
+}
+
 int Finalise(FinaliseOptions options)
 {
     // TODO: Refactor so this doesn't have to be defined all the time
     Utilities.GetOrCreateStacks(options.BaseStackPath);
-    int statusCode = 0;
-
-    if (Utilities.BashStack.Count > 0)
-    {
-#if debug
-        throw new InvalidOperationException("Failed to terminate program, stack is not empty.");
-#else
-        Console.WriteLine("WARNING: Sudden termination of program, deleting stack.");
-        statusCode = 1;
-        Utilities.BashStack.Clear();
-#endif
-    }
-    
-    File.Delete(Utilities.BashStack.Path);
+    int statusCode = Utilities.DeleteStacks();
     return statusCode;
 }

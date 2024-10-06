@@ -7,10 +7,10 @@ public static class Utilities
     public static string BaseStackPath { get; private set; }
     
     // A stack that the master agent (the bash client) will read from
-    public static IStack BashStack { get; private set; }
+    public static FatStack BashStack { get; private set; }
     
     // A stack that the slave agent (the program) will read from
-    public static IStack ProgramStack { get; private set; }
+    public static ThinStack ProgramStack { get; private set; }
     
     /// <summary>
     /// Prompt the user for a yes or no answer
@@ -87,10 +87,49 @@ public static class Utilities
         }
     }
 
+    /// <summary>
+    /// Instantiate the bash and program stacks creating them if they don't exist
+    /// </summary>
+    /// <param name="baseStackPath">The base stack path</param>
+    /// <param name="newStack">True if a new stack should be created, False if one should only be created if it doesn't exist</param>
     public static void GetOrCreateStacks(string baseStackPath, bool newStack = false)
     {
         BaseStackPath = baseStackPath;
         Utilities.BashStack = new FatStack($"{BaseStackPath}.bash", newStack);
         Utilities.ProgramStack = new ThinStack($"{BaseStackPath}.cli", newStack);
+    }
+
+    /// <summary>
+    /// Delete the bash and program stacks
+    /// </summary>
+    public static int DeleteStacks()
+    {
+        int statusCode = 0;
+        if (Utilities.BashStack.Count > 0)
+        {
+#if debug
+            throw new InvalidOperationException("Failed to terminate program, requested sudden deletion of non-empty bash stack.");
+#else
+            Console.WriteLine("WARNING: Requested sudden deletion of non-empty bash stack.");
+            statusCode = 1;
+            Utilities.BashStack.Clear();
+#endif
+        }
+        
+        File.Delete(Utilities.BashStack.Path);
+        
+        if (Utilities.ProgramStack.Count > 0)
+        {
+#if debug
+            throw new InvalidOperationException("Failed to terminate program, requested sudden deletion of non-empty program stack.");
+#else
+            Console.WriteLine("WARNING: Requested sudden deletion of non-empty program stack.");
+            statusCode = 1;
+            Utilities.ProgramStack.Clear();
+#endif
+        }
+        File.Delete(Utilities.ProgramStack.Path);
+
+        return statusCode;
     }
 }

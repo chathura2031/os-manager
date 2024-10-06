@@ -12,12 +12,3 @@ public interface IPackage
 
     public int Install(int stage, string data);
 }
-
-public static class PackageExtensions
-{
-    public static int InstallDependencies(this IPackage package)
-    {
-        // TODO: Check if the package is installed and if not, install the dependency
-        return 0;
-    }
-}
