@@ -8,7 +8,7 @@ public class PopStackOptions
 {
     [Option('s', "stack", Required = true,
         HelpText = "the location to use for communications (ie. memory or disk)")]
-    public string StackPath { get; set; }
+    public string BaseStackPath { get; set; }
     
     [Option('c', "count", Required = true,
         HelpText = "the number of nodes to pop from the stack")]

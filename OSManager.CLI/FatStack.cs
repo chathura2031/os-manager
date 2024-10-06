@@ -1,14 +1,15 @@
 namespace OSManager.CLI;
 
-public class StackManager
+/// <summary>
+/// A stack where the first node is stored in the head file
+/// </summary>
+public class FatStack : IStack
 {
-    public static StackManager Instance { get; set; }
-    
-    public string Path { get; set; }
+    public string Path { get; }
 
     public int Count => int.Parse(File.ReadAllLines(Path)[0]);
 
-    public StackManager(string path, bool newStack = true)
+    public FatStack(string path, bool newStack = false)
     {
         Path = path;
         // Create an empty stack
@@ -16,6 +17,27 @@ public class StackManager
         {
             File.WriteAllLines(Path, ["0", ""]);
         }
+    }
+
+    /// <summary>
+    /// Reset the stack head
+    /// </summary>
+    private void ResetHead()
+    {
+        File.WriteAllLines(Path, ["0", string.Empty]);
+    }
+
+    /// <summary>
+    /// Clear the whole stack
+    /// </summary>
+    public void Clear()
+    {
+        int count = Count;
+        for (int i = 0; i < count - 1; i++)
+        {
+            File.Delete($"{Path}.{i}");
+        }
+        ResetHead();
     }
 
     /// <summary>
@@ -41,14 +63,6 @@ public class StackManager
     public string? Peek()
     {
         return Peek(out _);
-    }
-
-    /// <summary>
-    /// Reset the stack head
-    /// </summary>
-    private void ResetHead()
-    {
-        File.WriteAllLines(Path, ["0", string.Empty]);
     }
 
     /// <summary>
@@ -78,19 +92,6 @@ public class StackManager
     }
 
     /// <summary>
-    /// Clear the whole stack
-    /// </summary>
-    public void Clear()
-    {
-        int count = Count;
-        for (int i = 0; i < count - 1; i++)
-        {
-            File.Delete($"{Path}.{i}");
-        }
-        ResetHead();
-    }
-
-    /// <summary>
     /// Push content to the stack
     /// </summary>
     /// <param name="content">The content to add to the stack</param>
@@ -108,30 +109,5 @@ public class StackManager
         
         lines = [count.ToString(), content];
         File.WriteAllLines(Path, lines);
-    }
-
-    /// <summary>
-    /// Push a bash command to the stack
-    /// </summary>
-    /// <param name="command">The bash command to add to the stack</param>
-    public void PushBashCommand(string command)
-    {
-        Push($"{command} && ./{Utilities.SlavePath} popstack --stack {Path} --count 1");
-    }
-
-    /// <summary>
-    /// Push a bash command to execute a specific stage of this project
-    /// </summary>
-    /// <param name="stage">The installation stage to run</param>
-    /// <param name="pathSafeName">The package's path safe name</param>
-    /// <param name="dataPath">The path to any data required (optional)</param>
-    public void PushNextStage(int stage, string pathSafeName, string? dataPath = null)
-    {
-        string content = $"./{Utilities.SlavePath} continue --stack {Path} --slave {Utilities.SlavePath} --stage {stage} --package {pathSafeName}";
-        if (dataPath != null)
-        {
-            content += $" --data {dataPath}";
-        }
-        Push(content);
     }
 }

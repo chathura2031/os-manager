@@ -10,7 +10,7 @@ public class InitialiseOptions
 {
     [Option('s', "stack", Required = true,
         HelpText = "the location to use for communications (ie. memory or disk)")]
-    public string StackPath { get; set; }
+    public string BaseStackPath { get; set; }
     
     [Option('a', "slave", Required = true,
         HelpText = "the path to the slave agent")]

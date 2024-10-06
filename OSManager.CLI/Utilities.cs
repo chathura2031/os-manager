@@ -4,6 +4,14 @@ public static class Utilities
 {
     public static string SlavePath { get; set; } = null!;
     
+    public static string BaseStackPath { get; private set; }
+    
+    // A stack that the master agent (the bash client) will read from
+    public static IStack BashStack { get; private set; }
+    
+    // A stack that the slave agent (the program) will read from
+    public static IStack ProgramStack { get; private set; }
+    
     /// <summary>
     /// Prompt the user for a yes or no answer
     /// </summary>
@@ -57,7 +65,7 @@ public static class Utilities
             {
                 stream.Result.CopyTo(fs);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"Failed to download file from {url}");
                 return 1;
@@ -77,5 +85,12 @@ public static class Utilities
         {
             actions[i]();
         }
+    }
+
+    public static void GetOrCreateStacks(string baseStackPath, bool newStack = false)
+    {
+        BaseStackPath = baseStackPath;
+        Utilities.BashStack = new FatStack($"{BaseStackPath}.bash", newStack);
+        Utilities.ProgramStack = new ThinStack($"{BaseStackPath}.cli", newStack);
     }
 }

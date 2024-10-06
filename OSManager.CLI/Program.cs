@@ -32,8 +32,7 @@ int Initialise(InitialiseOptions options)
     // TODO: Adjust for the case when the location is on disk
     // TODO: Refactor so this doesn't have to be defined all the time
     Utilities.SlavePath = options.SlavePath;
-    // Create a file to keep track of the stack size
-    StackManager.Instance = new StackManager(options.StackPath);
+    Utilities.GetOrCreateStacks(options.BaseStackPath, true);
 
     // TODO: Add ability for the user to select what to do here
     int selection = 0;
@@ -53,8 +52,8 @@ int GotoStep(ContinueOptions options)
 {
     // TODO: Refactor so this doesn't have to be defined all the time
     Utilities.SlavePath = options.SlavePath;
-    StackManager.Instance = new StackManager(options.StackPath, false);
-    StackManager.Instance.Pop();
+    Utilities.GetOrCreateStacks(options.BaseStackPath);
+    Utilities.BashStack.Pop();
 
     PackageRepository.GetPackage(options.Package).Install(options.Stage, options.DataPath);
     return 0;
@@ -62,10 +61,10 @@ int GotoStep(ContinueOptions options)
 
 int PopStack(PopStackOptions options)
 {
-    StackManager.Instance = new StackManager(options.StackPath, false);
+    Utilities.GetOrCreateStacks(options.BaseStackPath);
     for (int i = 0; i < options.Count; i++)
     {
-        StackManager.Instance.Pop();
+        Utilities.BashStack.Pop();
     }
     
     return 0;
@@ -74,20 +73,20 @@ int PopStack(PopStackOptions options)
 int Finalise(FinaliseOptions options)
 {
     // TODO: Refactor so this doesn't have to be defined all the time
-    StackManager.Instance = new StackManager(options.StackPath, false);
+    Utilities.GetOrCreateStacks(options.BaseStackPath);
     int statusCode = 0;
 
-    if (StackManager.Instance.Count > 0)
+    if (Utilities.BashStack.Count > 0)
     {
 #if debug
         throw new InvalidOperationException("Failed to terminate program, stack is not empty.");
 #else
         Console.WriteLine("WARNING: Sudden termination of program, deleting stack.");
         statusCode = 1;
-        StackManager.Instance.Clear();
+        Utilities.BashStack.Clear();
 #endif
     }
     
-    File.Delete(StackManager.Instance.Path);
+    File.Delete(Utilities.BashStack.Path);
     return statusCode;
 }

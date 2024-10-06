@@ -44,7 +44,7 @@ public class Discord : IPackage
         switch (stage)
         {
             case 0:
-                StackManager.Instance.PushNextStage(stage + 1, PathSafeName);
+                Utilities.BashStack.PushNextStage(stage + 1, PathSafeName);
                 this.InstallDependencies();
                 break;
             case 1:
@@ -59,8 +59,8 @@ public class Discord : IPackage
                 // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
-                    () => StackManager.Instance.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
-                    () => StackManager.Instance.PushNextStage(stage + 1, PathSafeName, filePath),
+                    () => Utilities.BashStack.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
+                    () => Utilities.BashStack.PushNextStage(stage + 1, PathSafeName, filePath),
                 ]);
                 break;
             case 2:

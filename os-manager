@@ -28,20 +28,21 @@ ram_unallocated=($(df /dev/shm/ | tail -n 1))
 ram_unallocated=${ram_unallocated[3]}
 
 # Figure out whether to store in memory or on disk
-stack_path=""
+stack_base_path=""
 if [[ $ram_unallocated > $min_ram_req ]]; then
-    stack_path="/dev/shm/"
+    stack_base_path="/dev/shm/"
 else
-    stack_path="/tmp/"
+    stack_base_path="/tmp/"
 fi
 
 # Get a new path to the stack head
 stack_id=$(uuidgen)
-stack_path=$stack_path"osman-"$stack_id".cli"
+stack_base_path=$stack_base_path"osman-"$stack_id
+stack_path=$stack_base_path".bash"
 
 # Run the manager UI
 manager="OSManager.CLI/bin/Debug/net8.0/OSManager.CLI"
-./$manager initialise --stack $stack_path --slave $manager
+./$manager initialise --stack $stack_base_path --slave $manager
 
 # Run any subsequent commands
 is_stack_empty
@@ -51,7 +52,7 @@ while [[ $? == 0 ]] ; do
 
     if [[ $last_command == $command ]]; then
         echo "Something is wrong, recieved the same command twice. Exiting..."
-        terminate $manager $stack_path 1
+        terminate $manager $stack_base_path 1
     fi
 
     eval $command
@@ -60,4 +61,4 @@ while [[ $? == 0 ]] ; do
     is_stack_empty
 done
 
-terminate $manager $stack_path 0
+terminate $manager $stack_base_path 0
