@@ -59,7 +59,7 @@ public class Discord : IPackage
                 // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
-                    () => Utilities.BashStack.PushBashCommand($"sudo apt install -y --fix-broken {filePath}"),
+                    () => Utilities.BashStack.PushBashCommand($"apt install -y --fix-broken {filePath}", true),
                     () => Utilities.BashStack.PushNextStage(stage + 1, PathSafeName, filePath),
                 ]);
                 break;

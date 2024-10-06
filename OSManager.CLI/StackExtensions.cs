@@ -7,9 +7,12 @@ public static class StackExtensions
     /// </summary>
     /// <param name="stack">A reference to a stack</param>
     /// <param name="command">The bash command to add to the stack</param>
-    public static void PushBashCommand(this IStack stack, string command)
+    /// <param name="useSudo">True if the command should use sudo, False otherwise</param>
+    public static void PushBashCommand(this IStack stack, string command, bool useSudo = false)
     {
-        stack.Push($"{command} && ./{Utilities.SlavePath} popstack --stack {Utilities.BaseStackPath} --count 1");
+        string bashCommand = useSudo ? "sudo " : "";
+        bashCommand += $"{command} && ./{Utilities.SlavePath} popstack --stack {Utilities.BaseStackPath} --count 1";
+        stack.Push(bashCommand);
     }
 
     /// <summary>
@@ -19,13 +22,17 @@ public static class StackExtensions
     /// <param name="stage">The installation stage to run</param>
     /// <param name="pathSafeName">The package's path safe name</param>
     /// <param name="dataPath">The path to any data required (optional)</param>
-    public static void PushNextStage(this IStack stack, int stage, string pathSafeName, string? dataPath = null)
+    /// <param name="adminAccess">True if the program needs admin access, False otherwise</param>
+    public static void PushNextStage(this IStack stack, int stage, string pathSafeName, string? dataPath = null, bool adminAccess = false)
     {
-        string content = $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --slave {Utilities.SlavePath} --stage {stage} --package {pathSafeName}";
+        string content = adminAccess ? "sudo " : "";
+        content += $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --slave {Utilities.SlavePath} --stage {stage} --package {pathSafeName}";
+        
         if (dataPath != null)
         {
             content += $" --data {dataPath}";
         }
+        
         stack.Push(content);
     }
 }
