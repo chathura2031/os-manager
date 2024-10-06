@@ -55,17 +55,8 @@ int GotoStep(ContinueOptions options)
     Utilities.SlavePath = options.SlavePath;
     StackManager.Instance = new StackManager(options.StackPath, false);
     StackManager.Instance.Pop();
-    
-    switch (options.Package)
-    {
-        // TODO: Get from variable instead of hard-coding
-        case "discord":
-            Discord.Instance.Install(options.Stage, options.DataPath);
-            break;
-        default:
-            throw new ArgumentException("Received an invalid package");
-    }
-    
+
+    PackageRepository.GetPackage(options.Package).Install(options.Stage, options.DataPath);
     return 0;
 }
 
