@@ -67,6 +67,10 @@ public static class Utilities
         return cancelOperation ? 1 : 0;
     }
 
+    /// <summary>
+    /// Run a chain of functions in the reverse order that they are passed in
+    /// </summary>
+    /// <param name="actions">A list of functions to run</param>
     public static void RunInReverse(Action[] actions)
     {
         for (int i = actions.Length - 1; i >= 0; i--)
