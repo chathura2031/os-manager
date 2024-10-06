@@ -10,7 +10,7 @@ public static class PackageRepository
 
     private static readonly Dictionary<string, IPackage> _packageLookup = new();
 
-    public static PackageRepository()
+    static PackageRepository()
     {
         foreach (IPackage package in _packages)
         {
