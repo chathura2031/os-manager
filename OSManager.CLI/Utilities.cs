@@ -1,3 +1,5 @@
+using PersistentTools.Stack;
+
 namespace OSManager.CLI;
 
 public static class Utilities
