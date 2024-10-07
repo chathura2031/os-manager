@@ -64,8 +64,7 @@ public class Discord : IPackage
                 ]);
                 break;
             case 2:
-                string filePath = data;
-                statusCode = DeletePackage(2, filePath);
+                statusCode = DeletePackage(2, data);
                 if (statusCode != 0)
                 {
                     Console.WriteLine("Failed to delete debian file");
