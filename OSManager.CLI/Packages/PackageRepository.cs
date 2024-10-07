@@ -1,11 +1,13 @@
-using OSManager.CLI.Packages;
-
-namespace OSManager.CLI;
+namespace OSManager.CLI.Packages;
 
 public static class PackageRepository
 {
+    // Keep track of all packages that are available
     private static HashSet<IPackage> _packages = [
-        Discord.Instance
+        PackageDependencies.Instance,
+        Discord.Instance,
+        Chrome.Instance, 
+        Vim.Instance 
     ];
 
     private static readonly Dictionary<string, IPackage> _packageLookup = new();
@@ -18,6 +20,12 @@ public static class PackageRepository
         }
     }
 
+    /// <summary>
+    /// Get a package from the package name
+    /// </summary>
+    /// <param name="pathSafeName">The name of the package</param>
+    /// <returns>A reference to the package instance</returns>
+    /// <exception cref="ArgumentException">If the package name is unknown</exception>
     public static IPackage GetPackage(string pathSafeName)
     {
         if (_packageLookup.TryGetValue(pathSafeName, out IPackage? value))

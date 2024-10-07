@@ -8,10 +8,10 @@ public class Discord : IPackage
 
     public string PathSafeName { get; } = "discord";
 
-    public HashSet<IPackage> Dependencies { get; } = [];
+    public List<IPackage> Dependencies { get; } = [];
     
-    public HashSet<IPackage> OptionalExtras { get; } = [];
-    
+    public List<IPackage> OptionalExtras { get; } = [];
+
     private int DownloadPackage(int verbosity, out string filePath)
     {
         // Download the debian package

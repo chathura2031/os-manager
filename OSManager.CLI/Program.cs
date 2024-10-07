@@ -40,7 +40,7 @@ int Initialise(InitialiseOptions options)
     switch (selection)
     {
         case 0:
-            Discord.Instance.Install(0, null);
+            Utilities.BashStack.PushNextStage(0, Discord.Instance.PathSafeName);
             break;
         default:
             throw new ArgumentException("Received an invalid selection");
@@ -56,8 +56,8 @@ int GotoStep(ContinueOptions options)
     Utilities.GetOrCreateStacks(options.BaseStackPath);
     Utilities.BashStack.Pop();
 
-    PackageRepository.GetPackage(options.Package).Install(options.Stage, options.DataPath);
-    return 0;
+    int statusCode = PackageRepository.GetPackage(options.Package).Install(options.Stage, options.DataPath);
+    return statusCode;
 }
 
 int PopStack(PopStackOptions options)

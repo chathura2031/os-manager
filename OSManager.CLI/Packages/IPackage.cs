@@ -6,9 +6,9 @@ public interface IPackage
     
     string PathSafeName { get; }
     
-    HashSet<IPackage> Dependencies { get; }
+    List<IPackage> Dependencies { get; }
     
-    HashSet<IPackage> OptionalExtras { get; }
+    List<IPackage> OptionalExtras { get; }
 
     public int Install(int stage, string data);
 }

@@ -57,7 +57,7 @@ public class ThinStack : IStack
         }
 
         nodePath = $"{Path}.{count - 1}";
-        return File.ReadAllLines(nodePath)[0];
+        return File.ReadAllText(nodePath);
     }
 
     /// <summary>
