@@ -9,25 +9,26 @@ public class PackageDependencies : IPackage
 {
     public static readonly PackageDependencies Instance = new();
 
-    public string Name { get; } = "Dependencies";
-    public string PathSafeName { get; } = "@internal:dependencies";
+    public string Name { get; } = "@internal:dependencies";
 
+    public string HumanReadableName { get; } = "Dependencies";
+    
     public List<IPackage> Dependencies { get; } = [];
 
     public List<IPackage> OptionalExtras { get; } = [];
     
-    public int Install(int stage, string pathSafeName)
+    public int Install(int stage, string dependencyName)
     {
-        IPackage package = PackageRepository.GetPackage(pathSafeName);
+        IPackage package = PackageRepository.GetPackage(dependencyName);
         
         switch (stage)
         {
             case 0:
                 // Check whether each dependency has been installed
-                Utilities.BashStack.PushNextStage(stage + 1, PathSafeName, pathSafeName);
+                Utilities.BashStack.PushNextStage(stage + 1, Name, dependencyName);
                 foreach (IPackage dependency in package.Dependencies)
                 {
-                    Utilities.BashStack.PushPackageExistsCommand(dependency.PathSafeName);
+                    Utilities.BashStack.PushPackageExistsCommand(dependency.Name);
                 }
                 break;
             case 1:
@@ -39,11 +40,11 @@ public class PackageDependencies : IPackage
 
                     if (packageName == "no")
                     {
-                        Utilities.BashStack.PushNextStage(0, dependency.PathSafeName);
+                        Utilities.BashStack.PushNextStage(0, dependency.Name);
                     }
-                    else if (packageName != dependency.PathSafeName)
+                    else if (packageName != dependency.Name)
                     {
-                        throw new ArgumentException($"Received installation status for {packageName} but expected {dependency.PathSafeName}");
+                        throw new ArgumentException($"Received installation status for {packageName} but expected {dependency.Name}");
                     }
                 }
                 break;

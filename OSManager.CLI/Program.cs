@@ -40,7 +40,7 @@ int Initialise(InitialiseOptions options)
     switch (selection)
     {
         case 0:
-            Utilities.BashStack.PushNextStage(0, Discord.Instance.PathSafeName);
+            Utilities.BashStack.PushNextStage(0, Discord.Instance.Name);
             break;
         default:
             throw new ArgumentException("Received an invalid selection");

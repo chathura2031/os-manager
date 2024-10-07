@@ -4,11 +4,11 @@ public interface IPackage
 {
     string Name { get; }
     
-    string PathSafeName { get; }
+    string HumanReadableName { get; }
     
     List<IPackage> Dependencies { get; }
     
     List<IPackage> OptionalExtras { get; }
 
-    public int Install(int stage, string data);
+    public int Install(int stage, string dependencyName);
 }

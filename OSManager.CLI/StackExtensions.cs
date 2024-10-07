@@ -19,10 +19,10 @@ public static class StackExtensions
     /// Push a bash command to check if a package exists
     /// </summary>
     /// <param name="stack">A reference to a stack</param>
-    /// <param name="pathSafeName">The name of the package to check for</param>
-    public static void PushPackageExistsCommand(this FatStack stack, string pathSafeName)
+    /// <param name="packageName">The name of the package to check for</param>
+    public static void PushPackageExistsCommand(this FatStack stack, string packageName)
     {
-        string command = $"(dpkg -l {pathSafeName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --stack {Utilities.BaseStackPath})";
+        string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --stack {Utilities.BaseStackPath})";
         PushBashCommand(stack, command, false);
     }
 
@@ -31,13 +31,13 @@ public static class StackExtensions
     /// </summary>
     /// <param name="stack">A reference to a stack</param>
     /// <param name="stage">The installation stage to run</param>
-    /// <param name="pathSafeName">The package's path safe name</param>
+    /// <param name="packageName">The package's name</param>
     /// <param name="dataPath">The path to any data required (optional)</param>
     /// <param name="adminAccess">True if the program needs admin access, False otherwise</param>
-    public static void PushNextStage(this FatStack stack, int stage, string pathSafeName, string? dataPath = null, bool adminAccess = false)
+    public static void PushNextStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
     {
         string content = adminAccess ? "sudo " : "";
-        content += $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --slave {Utilities.SlavePath} --stage {stage} --package {pathSafeName}";
+        content += $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --slave {Utilities.SlavePath} --stage {stage} --package {packageName}";
         
         if (dataPath != null)
         {

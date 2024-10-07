@@ -4,9 +4,9 @@ public class Discord : IPackage
 {
     public static readonly Discord Instance = new();
     
-    public string Name { get; } = "Discord";
+    public string Name { get; } = "discord";
 
-    public string PathSafeName { get; } = "discord";
+    public string HumanReadableName { get; } = "Discord";
 
     public List<IPackage> Dependencies { get; } = [];
     
@@ -21,7 +21,7 @@ public class Discord : IPackage
         }
 
         int statusCode = Utilities.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{PathSafeName}.deb", out filePath);
+            $"{Name}.deb", out filePath);
 
         return statusCode;
     }
@@ -38,13 +38,13 @@ public class Discord : IPackage
         return 0;
     }
 
-    public int Install(int stage, string? data)
+    public int Install(int stage, string? dependencyName)
     {
         int statusCode = 0;
         switch (stage)
         {
             case 0:
-                Utilities.BashStack.PushNextStage(stage + 1, PathSafeName);
+                Utilities.BashStack.PushNextStage(stage + 1, Name);
                 this.InstallDependencies();
                 break;
             case 1:
@@ -60,11 +60,11 @@ public class Discord : IPackage
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"apt install -y --fix-broken {filePath}", true),
-                    () => Utilities.BashStack.PushNextStage(stage + 1, PathSafeName, filePath),
+                    () => Utilities.BashStack.PushNextStage(stage + 1, Name, filePath),
                 ]);
                 break;
             case 2:
-                statusCode = DeletePackage(2, (string)data!);
+                statusCode = DeletePackage(2, (string)dependencyName!);
                 if (statusCode != 0)
                 {
                     Console.WriteLine("Failed to delete debian file");
@@ -72,7 +72,7 @@ public class Discord : IPackage
                 }
                 break;
             default:
-                throw new ArgumentException($"{Name} does not have {stage} stages of installation.");
+                throw new ArgumentException($"{HumanReadableName} does not have {stage} stages of installation.");
         }
 
         return statusCode;
