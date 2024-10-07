@@ -5,6 +5,7 @@ public static class PackageRepository
     // Keep track of all packages that are available
     private static HashSet<IPackage> _packages = [
         PackageDependencies.Instance,
+        UpdateAndUpgrade.Instance,
         Discord.Instance,
         Chrome.Instance, 
         Vim.Instance 

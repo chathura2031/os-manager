@@ -24,6 +24,11 @@ public class PackageDependencies : IPackage
         switch (stage)
         {
             case 0:
+                // Update sources and upgrade packages
+                Utilities.BashStack.PushNextStage(stage + 1, Name, dependencyName);
+                UpdateAndUpgrade.Instance.Install(0, "");
+                break;
+            case 1:
                 // Check whether each dependency has been installed
                 Utilities.BashStack.PushNextStage(stage + 1, Name, dependencyName);
                 foreach (IPackage dependency in package.Dependencies)
@@ -31,7 +36,7 @@ public class PackageDependencies : IPackage
                     Utilities.BashStack.PushPackageExistsCommand(dependency.Name);
                 }
                 break;
-            case 1:
+            case 2:
                 // Install each dependency that has not been installed
                 foreach (IPackage dependency in package.Dependencies)
                 {
