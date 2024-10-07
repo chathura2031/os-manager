@@ -14,6 +14,20 @@ public class Vim : IPackage
     
     public int Install(int stage, string dependencyName)
     {
-        throw new NotImplementedException();
+        int statusCode = 0;
+        switch (stage)
+        {
+            case 0:
+                Utilities.BashStack.PushNextStage(stage + 1, Name);
+                this.InstallDependencies();
+                break;
+            case 1:
+                Utilities.BashStack.PushBashCommand("apt install vim", true);
+                break;
+            default:
+                throw new ArgumentException($"{HumanReadableName} does not have {stage} stages of installation.");
+        }
+        
+        return statusCode;
     }
 }
