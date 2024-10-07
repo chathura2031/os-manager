@@ -12,7 +12,7 @@ public class Vim : IPackage
 
     public List<IPackage> OptionalExtras { get; } = [];
     
-    public int Install(int stage, string dependencyName)
+    public int Install(int stage, string data)
     {
         int statusCode = 0;
         switch (stage)

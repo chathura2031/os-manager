@@ -38,7 +38,7 @@ public class Discord : IPackage
         return 0;
     }
 
-    public int Install(int stage, string? dependencyName)
+    public int Install(int stage, string data)
     {
         int statusCode = 0;
         switch (stage)
@@ -64,7 +64,8 @@ public class Discord : IPackage
                 ]);
                 break;
             case 2:
-                statusCode = DeletePackage(2, (string)dependencyName!);
+                string filePath = data;
+                statusCode = DeletePackage(2, filePath);
                 if (statusCode != 0)
                 {
                     Console.WriteLine("Failed to delete debian file");
