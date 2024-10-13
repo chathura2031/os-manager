@@ -15,34 +15,48 @@ async Task StartServer(CancellationToken stoppingToken)
         }
     };
 
-    byte[] bytes;
-    string s;
-    {
-        MemoryStream stream = new();
-        Serializer.Serialize(stream, person);
-        bytes = stream.ToArray();
-        s = System.Text.Encoding.UTF8.GetString(bytes);
-    }
+    // byte[] bytes;
+    // string s;
+    // {
+    //     MemoryStream stream = new();
+    //     Serializer.Serialize(stream, person);
+    //     bytes = stream.ToArray();
+    //     s = System.Text.Encoding.UTF8.GetString(bytes);
+    // }
 
-    // TODO: Figure out how to serialise and deserialize
-    Person person1;
-    {
-        MemoryStream stream = new(bytes);
-        person1 = Serializer.Deserialize<Person>(stream);
-    }
+    // // TODO: Figure out how to serialise and deserialize
+    // Person person1;
+    // {
+    //     person1 = Serializer.Deserialize<Person>(new MemoryStream(bytes));
+    // }
     
     NamedPipeServerStream server = new("PipesOfPiece");
     await server.WaitForConnectionAsync();
+    BinaryWriter binaryWriter = new(server);
     StreamReader reader = new(server);
-    StreamWriter writer = new(server);
+    // StreamWriter writer = new(server);
 
     while (!stoppingToken.IsCancellationRequested)
     {
         string? line = reader.ReadLine();
         if (line != null)
         {
-            writer.WriteLine(String.Join("", line.Reverse()));
-            writer.Flush();
+            byte[] data = Serialize(person);
+            binaryWriter.Write(data);
+            binaryWriter.Flush();
+            // writer.WriteLine(String.Join("", line.Reverse()));
+            // writer.Flush();
         }
     }
+}
+
+byte[] Serialize<T>(T obj)
+{
+    MemoryStream stream = new();
+    Serializer.Serialize(stream, obj);
+    var data = new byte[stream.Length + 1];
+    Array.Copy(stream.ToArray(), data, stream.Length);
+    data[^1] = 0;
+    
+    return data;
 }
