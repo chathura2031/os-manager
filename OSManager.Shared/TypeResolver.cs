@@ -7,7 +7,10 @@ public static class TypeResolver
     private static readonly Dictionary<Type, byte> _lookup = new()
     {
         { typeof(InstallCommand), 1 },
-        { typeof(ResponseCommand), 2 }
+        { typeof(ResponseCommand), 2 },
+        { typeof(InitialiseCommand), 3 },
+        { typeof(PopStackCommand), 4 },
+        { typeof(DisconnectCommand), 5 }
     };
     private static readonly Dictionary<byte, Type> _reverseLookup;
 

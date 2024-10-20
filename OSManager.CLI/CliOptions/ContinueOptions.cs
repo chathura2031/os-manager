@@ -6,10 +6,6 @@ namespace OSManager.CLI.CliOptions;
 [Verb("continue", HelpText = "TODO")]
 public class ContinueOptions
 {
-    [Option('s', "stack", Required = true,
-        HelpText = "the location to use for communications (ie. memory or disk)")]
-    public string BaseStackPath { get; set; }
-    
     [Option('a', "slave", Required = true,
         HelpText = "the path to the slave agent")]
     public string SlavePath { get; set; }
