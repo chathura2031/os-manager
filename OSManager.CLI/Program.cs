@@ -1,35 +1,22 @@
 ﻿using System.IO.Pipes;
-using OSManager.CLI;
-using ProtoBuf;
+using OSManager.Shared;
+using OSManager.Shared.Commands;
 
 var client = new NamedPipeClientStream("PipesOfPiece");
 client.Connect(1000);
-BinaryReader binaryReader = new(client);
-StreamReader reader = new StreamReader(client);
-StreamWriter writer = new StreamWriter(client);
+BinaryReader reader = new(client);
+BinaryWriter writer = new(client);
 
-while (true)
+InstallCommand discord = new()
 {
-    string input = Console.ReadLine();
-    if (String.IsNullOrEmpty(input)) break;
-    writer.WriteLine(input);
-    writer.Flush();
+    Package = Packages.Discord,
+    Stage = 1
+};
 
-    MemoryStream stream = new(GetData());
-    Person person = Serializer.Deserialize<Person>(stream);
-}
+byte[] data = Communication.Serialize(discord);
+writer.Write(data);
+writer.Flush();
+
+object response = Communication.Deserialize(Communication.GetData(reader), out Type type);
 
 client.Close();
-
-byte[] GetData()
-{
-    List<byte> output = new();
-    byte? val;
-    
-    while ((val = binaryReader.ReadByte()) != 0)
-    {
-        output.Add((byte)val);
-    }
-
-    return output.ToArray();
-}

@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OSManager.Core\OSManager.Core.csproj" />
+      <ProjectReference Include="..\OSManager.Shared\OSManager.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
