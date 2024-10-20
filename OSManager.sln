@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSManager.Shared", "OSManag
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D33E5DDF-6652-4CF4-AD41-EF4DCCE30978}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSManager.Communications.Proto", "Plugins\OSManager.Communications.Proto\OSManager.Communications.Proto.csproj", "{3BDFA599-70E2-4BF2-81D1-C0715126CCFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,5 +34,12 @@ Global
 		{E9F7D780-C5BB-4F5F-BE9E-95F06A87EA19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9F7D780-C5BB-4F5F-BE9E-95F06A87EA19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9F7D780-C5BB-4F5F-BE9E-95F06A87EA19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BDFA599-70E2-4BF2-81D1-C0715126CCFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BDFA599-70E2-4BF2-81D1-C0715126CCFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BDFA599-70E2-4BF2-81D1-C0715126CCFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BDFA599-70E2-4BF2-81D1-C0715126CCFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3BDFA599-70E2-4BF2-81D1-C0715126CCFE} = {D33E5DDF-6652-4CF4-AD41-EF4DCCE30978}
 	EndGlobalSection
 EndGlobal

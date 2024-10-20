@@ -3,6 +3,8 @@ using System.Reflection;
 using CommandLine;
 using OSManager.CLI;
 using OSManager.CLI.CliOptions;
+using OSManager.Communications.Proto;
+using OSManager.Core;
 using OSManager.Shared;
 using OSManager.Shared.Commands;
 
@@ -20,18 +22,22 @@ int Initialise(InitialiseOptions options)
     AssemblyName assembly = Assembly.GetEntryAssembly()!.GetName();
     Console.WriteLine($"Version {assembly.Version}");
 
-    var client = new NamedPipeClientStream("PipesOfPiece");
-    client.Connect(1000);
-    BinaryWriter writer = new(client);
-    BinaryReader reader = new(client);
+    // TODO: Use dependency injection
+    ICommunication communication = new ProtoCommunication("PipesOfPiece");
+    int statusCode = communication.ConnectToServer(out BinaryReader? reader, out BinaryWriter? writer);
+    // TODO: Handle status code
+    if (statusCode != 0)
+    {
+        throw new NotImplementedException();
+    }
 
     byte[] data = Communication.Serialize(new InitialiseCommand()
     {
         BaseStackPath = options.BaseStackPath,
         SlavePath = options.SlavePath
     });
-    writer.Write(data);
-    writer.Flush();
+    writer!.Write(data);
+    writer!.Flush();
     
     // TODO: Add ability for the user to select what to do here
     int selection = 0;
@@ -52,9 +58,6 @@ int Initialise(InitialiseOptions options)
     }
     
     var response = (ResponseCommand)Communication.Deserialize(Communication.GetData(reader), out Type type);
-    
-    client.Close();
-    client.Dispose();
     
     return response.StatusCode;
 }
