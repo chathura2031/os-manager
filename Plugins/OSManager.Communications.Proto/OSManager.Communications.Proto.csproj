@@ -10,4 +10,10 @@
       <ProjectReference Include="..\..\OSManager.Core\OSManager.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="protobuf-net">
+        <HintPath>..\..\..\..\.nuget\packages\protobuf-net\3.2.30\lib\net6.0\protobuf-net.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

@@ -1,8 +1,10 @@
 ﻿using System.IO.Pipes;
+using OSManager.Communications.Proto;
+using OSManager.Core.Commands;
+using OSManager.Core.Enums;
 using OSManager.Daemon;
 using OSManager.Daemon.Packages;
-using OSManager.Shared;
-using OSManager.Shared.Commands;
+// using OSManager.Shared;
 
 await StartServer(new CancellationToken());
 Task.Delay(1000).Wait();
@@ -13,6 +15,7 @@ async Task StartServer(CancellationToken stoppingToken)
     BinaryWriter writer = new(server);
     BinaryReader reader = new(server);
     
+    // TODO: Figure out why running the bash program more than once breaks it -- for some reason the server sends off too many response commands
     while (true)
     {
         if (!server.IsConnected)
@@ -32,7 +35,7 @@ async Task StartServer(CancellationToken stoppingToken)
         {
             var installCommand = (InstallCommand)data;
             int statusCode;
-            if (installCommand.Package == Packages.Discord)
+            if (installCommand.Package == Package.Discord)
             {
                 statusCode = Discord.Instance.Install(installCommand.Stage, installCommand.Data ?? string.Empty);
             }
@@ -47,8 +50,11 @@ async Task StartServer(CancellationToken stoppingToken)
             });
             writer.Write(binary);
             writer.Flush();
-            
-            server.Disconnect();
+
+            if (installCommand.DisconnectAfter)
+            {
+                server.Disconnect();
+            }
         }
         else if (data.GetType() == typeof(PopStackCommand))
         {
@@ -65,6 +71,14 @@ async Task StartServer(CancellationToken stoppingToken)
             writer.Write(binary);
             writer.Flush();
             
+            if (popCommand.DisconnectAfter)
+            {
+                server.Disconnect();
+            }
+        }
+        else if (data.GetType() == typeof(FinaliseCommand))
+        {
+            Utilities.DeleteStacks();
             server.Disconnect();
         }
         else if (data.GetType() == typeof(DisconnectCommand))

@@ -15,8 +15,8 @@ is_stack_empty() {
 }
 
 terminate() {
-    ./$1 finalise --stack $2
-    exit $3
+    ./$1 finalise
+    exit $2
 }
 
 # The minimum amount of RAM (in KB) required to store the next command to run
@@ -52,7 +52,7 @@ while [[ $? == 0 ]] ; do
 
     if [[ $last_command == $command ]]; then
         echo "Something is wrong, recieved the same command twice. Exiting..."
-        terminate $manager $stack_base_path 1
+        terminate $manager 1
     fi
 
     eval $command
@@ -65,4 +65,4 @@ while [[ $? == 0 ]] ; do
     is_stack_empty
 done
 
-terminate $manager $stack_base_path 0
+terminate $manager 0
