@@ -56,29 +56,7 @@ public static class Communication
         byte[] objData = data[1..];
         MemoryStream stream = new(objData);
         
-        // TODO: Figure out a non-manual method
-        if (type == typeof(InstallCommand))
-        {
-            return Serializer.Deserialize<InstallCommand>(stream);
-        }
-        else if (type == typeof(ResponseCommand))
-        {
-            return Serializer.Deserialize<ResponseCommand>(stream);
-        }
-        else if (type == typeof(InitialiseCommand))
-        {
-            return Serializer.Deserialize<InitialiseCommand>(stream);
-        }
-        else if (type == typeof(PopStackCommand))
-        {
-            return Serializer.Deserialize<PopStackCommand>(stream);
-        }
-        else if (type == typeof(FinaliseCommand))
-        {
-            return Serializer.Deserialize<FinaliseCommand>(stream);
-        }
-
-        throw new NotImplementedException();
+        return Serializer.Deserialize(type, stream);
     }
     
     public static Type ToType(this byte metadata)
