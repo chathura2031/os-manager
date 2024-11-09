@@ -1,5 +1,3 @@
-using OSManager.Plugins.Intercommunication.Interfaces;
-
 namespace OSManager.Plugins.Intercommunication.Commands;
 
 public interface IInitialiseCommand : ICommand

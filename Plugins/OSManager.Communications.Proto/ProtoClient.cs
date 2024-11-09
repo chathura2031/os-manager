@@ -1,7 +1,6 @@
 using System.IO.Pipes;
 using OSManager.Plugins.Intercommunication;
 using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Interfaces;
 
 namespace OSManager.Communications.Proto;
 

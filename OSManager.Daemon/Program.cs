@@ -4,7 +4,6 @@ using OSManager.Daemon.Packages;
 using OSManager.Plugins.Intercommunication;
 using OSManager.Plugins.Intercommunication.Commands;
 using OSManager.Plugins.Intercommunication.Enums;
-using OSManager.Plugins.Intercommunication.Interfaces;
 
 // using OSManager.Shared;
 

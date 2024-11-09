@@ -1,5 +1,4 @@
 using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Interfaces;
 
 namespace OSManager.Plugins.Intercommunication;
 
