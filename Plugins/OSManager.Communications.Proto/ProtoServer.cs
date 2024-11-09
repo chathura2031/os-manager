@@ -1,11 +1,11 @@
 ﻿using System.IO.Pipes;
-using OSManager.Core;
-using OSManager.Core.Commands;
-using OSManager.Core.Interfaces;
+using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Interfaces;
 
 namespace OSManager.Communications.Proto;
 
-public class ProtoServer : IServer
+public class ProtoServer : IIntercommServer
 {
     private readonly NamedPipeClientStream? _client;
     private readonly BinaryReader? _reader;
@@ -60,11 +60,11 @@ public class ProtoServer : IServer
         return 0;
     }
 
-    public int GetResponse(out ResponseCommand? response)
+    public int GetResponse(out IResponseCommand? response)
     {
         try
         {
-            response = (ResponseCommand)Communication.Deserialize(Communication.GetData((BinaryReader)_reader!),
+            response = (IResponseCommand)Communication.Deserialize(Communication.GetData((BinaryReader)_reader!),
                 out Type type);
         }
         catch (Exception e)

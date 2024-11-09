@@ -1,9 +1,11 @@
-﻿using System.IO.Pipes;
-using OSManager.Communications.Proto;
-using OSManager.Core.Commands;
-using OSManager.Core.Enums;
+﻿using OSManager.Communications.Proto;
 using OSManager.Daemon;
 using OSManager.Daemon.Packages;
+using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Plugins.Intercommunication.Interfaces;
+
 // using OSManager.Shared;
 
 await StartServer(new CancellationToken());
@@ -11,19 +13,17 @@ Task.Delay(1000).Wait();
 
 async Task StartServer(CancellationToken stoppingToken)
 {
-    NamedPipeServerStream server = new("PipesOfPiece");
-    BinaryWriter writer = new(server);
-    BinaryReader reader = new(server);
+    IIntercommClient client = new ProtoClient();
     
-    // TODO: Figure out why running the bash program more than once breaks it -- for some reason the server sends off too many response commands
+    // TODO: Move all communication stuff into the proto plugin
     while (true)
     {
-        if (!server.IsConnected)
+        if (!client.IsConnected)
         {
-            await server.WaitForConnectionAsync();
+            await client.WaitForClient();
         }
-        
-        object data = Communication.Deserialize(Communication.GetData(reader), out Type type);
+
+        ICommand data = await client.ReceiveCommand();
 
         if (data.GetType() == typeof(InitialiseCommand))
         {
@@ -44,16 +44,11 @@ async Task StartServer(CancellationToken stoppingToken)
                 throw new NotImplementedException();
             }
 
-            byte[] binary = Communication.Serialize(new ResponseCommand()
-            {
-                StatusCode = statusCode
-            });
-            writer.Write(binary);
-            writer.Flush();
+            await client.SendResponse(statusCode);
 
             if (installCommand.DisconnectAfter)
             {
-                server.Disconnect();
+                await client.DisconnectFromClient();
             }
         }
         else if (data.GetType() == typeof(PopStackCommand))
@@ -63,27 +58,18 @@ async Task StartServer(CancellationToken stoppingToken)
             {
                 Utilities.BashStack.Pop();
             }
-            
-            byte[] binary = Communication.Serialize(new ResponseCommand()
-            {
-                StatusCode = 0
-            });
-            writer.Write(binary);
-            writer.Flush();
+
+            await client.SendResponse(0);
             
             if (popCommand.DisconnectAfter)
             {
-                server.Disconnect();
+                await client.DisconnectFromClient();
             }
         }
         else if (data.GetType() == typeof(FinaliseCommand))
         {
             Utilities.DeleteStacks();
-            server.Disconnect();
-        }
-        else if (data.GetType() == typeof(DisconnectCommand))
-        {
-            server.Disconnect();
+            await client.DisconnectFromClient();
         }
         else
         {

@@ -1,7 +1,7 @@
-using OSManager.Core.Commands;
-using OSManager.Core.Extensions;
+using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Extensions;
 
-namespace OSManager.Core.Enums;
+namespace OSManager.Plugins.Intercommunication.Enums;
 
 public enum Command
 {
@@ -13,9 +13,6 @@ public enum Command
     
     [Type(typeof(PopStackCommand))]
     PopStackCommand,
-    
-    [Type(typeof(DisconnectCommand))]
-    DisconnectCommand,
     
     [Type(typeof(ResponseCommand))]
     ResponseCommand,

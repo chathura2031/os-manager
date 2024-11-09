@@ -1,6 +1,6 @@
-using OSManager.Core.Commands;
-using OSManager.Core.Enums;
-using OSManager.Core.Extensions;
+using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Plugins.Intercommunication.Extensions;
 using ProtoBuf;
 
 namespace OSManager.Communications.Proto;
@@ -73,10 +73,6 @@ public static class Communication
         {
             return Serializer.Deserialize<PopStackCommand>(stream);
         }
-        else if (type == typeof(DisconnectCommand))
-        {
-            return Serializer.Deserialize<DisconnectCommand>(stream);
-        }
         else if (type == typeof(FinaliseCommand))
         {
             return Serializer.Deserialize<FinaliseCommand>(stream);
@@ -98,7 +94,8 @@ public static class Communication
 
     private static byte ToByteIdentifier<T>(T obj)
     {
-        bool success = Lookup.TryGetValue(obj!.GetType(), out byte output);
+        Type test = obj!.GetType();
+        bool success = Lookup.TryGetValue(test, out byte output);
         if (!success)
         {
             throw new NotImplementedException($"No corresponding identifier exists for type {obj.GetType()}");

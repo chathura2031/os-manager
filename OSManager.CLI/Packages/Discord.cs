@@ -48,6 +48,7 @@ public class Discord : IPackage
                 this.InstallDependencies();
                 break;
             case 1:
+                // TODO: Download to /tmp/
                 statusCode = DownloadPackage(2, out string filePath);
                 if (statusCode != 0)
                 {

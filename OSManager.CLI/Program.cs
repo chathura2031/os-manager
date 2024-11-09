@@ -2,10 +2,9 @@
 using OSManager.CLI;
 using OSManager.CLI.CliOptions;
 using OSManager.Communications.Proto;
-using OSManager.Core;
-using OSManager.Core.Interfaces;
+using OSManager.Plugins.Intercommunication;
 
-IServer server = new ProtoServer("PipesOfPiece");
+IIntercommServer server = new ProtoServer("PipesOfPiece");
 Stuff stuff = new(server);
 
 // TODO: Figure out a way to avoid having the types in angle brackets and in the map result

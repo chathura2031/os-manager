@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\OSManager.Core\OSManager.Core.csproj" />
+      <ProjectReference Include="..\OSManager.Plugins\OSManager.Plugins.csproj" />
     </ItemGroup>
 
     <ItemGroup>

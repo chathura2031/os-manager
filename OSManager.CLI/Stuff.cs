@@ -1,15 +1,15 @@
 using System.Reflection;
 using OSManager.CLI.CliOptions;
-using OSManager.Core.Commands;
-using OSManager.Core.Enums;
-using OSManager.Core.Interfaces;
+using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.CLI;
 
-public class Stuff(IServer server)
+public class Stuff(IIntercommServer server)
 {
     // TODO: Use dependency injection
-    private readonly IServer _server = server;
+    private readonly IIntercommServer _server = server;
     
     public int Initialise(InitialiseOptions options)
     {
@@ -23,7 +23,7 @@ public class Stuff(IServer server)
             throw new NotImplementedException();
         }
 
-        statusCode = _server.SendCommand(new InitialiseCommand()
+        statusCode = _server.SendCommand(new InitialiseCommand
         {
             BaseStackPath = options.BaseStackPath,
             SlavePath = options.SlavePath
@@ -40,7 +40,7 @@ public class Stuff(IServer server)
         {
             case 0:
                 // TODO: Handle status code
-                _server.SendCommand(new InstallCommand()
+                _server.SendCommand(new InstallCommand
                 {
                     Package = Package.Discord,
                     Stage = 1,
@@ -52,7 +52,7 @@ public class Stuff(IServer server)
                 throw new ArgumentException("Received an invalid selection");
         }
 
-        statusCode = _server.GetResponse(out ResponseCommand? response);
+        statusCode = _server.GetResponse(out IResponseCommand? response);
         // TODO: Handle the status code
         if (statusCode != 0)
         {
@@ -73,14 +73,14 @@ public class Stuff(IServer server)
         
         // TODO: Find a way to always have a response command after each send command
         // TODO: Handle status code
-        statusCode = _server.SendCommand(new PopStackCommand() { Count = 1, DisconnectAfter = false });
+        statusCode = _server.SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = false });
         // TODO: Handle the status code
         if (statusCode != 0)
         {
             throw new NotImplementedException();
         }
         
-        statusCode = _server.GetResponse(out ResponseCommand? response);
+        statusCode = _server.GetResponse(out IResponseCommand? response);
         // TODO: Handle the status code
         if (statusCode != 0)
         {
@@ -91,7 +91,7 @@ public class Stuff(IServer server)
         if (options.Package == "discord")
         {
             // TODO: Handle status code
-            _server.SendCommand(new InstallCommand()
+            _server.SendCommand(new InstallCommand
             {
                 Package = Package.Discord,
                 Stage = options.Stage,
@@ -104,7 +104,7 @@ public class Stuff(IServer server)
             throw new NotImplementedException();
         }
         
-        statusCode = _server.GetResponse(out ResponseCommand? response1);
+        statusCode = _server.GetResponse(out IResponseCommand? response1);
         // TODO: Handle the status code
         if (statusCode != 0)
         {
@@ -124,9 +124,9 @@ public class Stuff(IServer server)
         }
 
         // TODO: Handle status code
-        _server.SendCommand(new PopStackCommand() { Count = 1, DisconnectAfter = true });
+        _server.SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = true });
         
-        statusCode = _server.GetResponse(out ResponseCommand? response);
+        statusCode = _server.GetResponse(out IResponseCommand? response);
         // TODO: Handle the status code
         if (statusCode != 0)
         {
