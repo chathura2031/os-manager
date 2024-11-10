@@ -5,8 +5,6 @@ using OSManager.Plugins.Intercommunication;
 using OSManager.Plugins.Intercommunication.Commands;
 using OSManager.Plugins.Intercommunication.Enums;
 
-// using OSManager.Shared;
-
 await StartServer(new CancellationToken());
 Task.Delay(1000).Wait();
 

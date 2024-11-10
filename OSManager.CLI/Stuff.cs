@@ -1,7 +1,6 @@
 using System.Reflection;
 using OSManager.CLI.CliOptions;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Commands;
 using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.CLI;
@@ -16,19 +15,8 @@ public class Stuff(IIntercommServer server)
         AssemblyName assembly = Assembly.GetEntryAssembly()!.GetName();
         Console.WriteLine($"Version {assembly.Version}");
 
-        int statusCode = _server.ConnectToServer();
         // TODO: Handle status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        statusCode = _server.SendCommand(new InitialiseCommand
-        {
-            BaseStackPath = options.BaseStackPath,
-            SlavePath = options.SlavePath
-        });
-        // TODO: Handle status code
+        int statusCode = _server.ConnectToServer(options.BaseStackPath, options.SlavePath);
         if (statusCode != 0)
         {
             throw new NotImplementedException();
@@ -36,135 +24,42 @@ public class Stuff(IIntercommServer server)
         
         // TODO: Add ability for the user to select what to do here
         int selection = 0;
-        switch (selection)
+        if (selection == 0)
         {
-            case 0:
-                // TODO: Handle status code
-                _server.SendCommand(new InstallCommand
-                {
-                    Package = Package.Discord,
-                    Stage = 1,
-                    DisconnectAfter = true
-                });
-        
-                break;
-            default:
-                throw new ArgumentException("Received an invalid selection");
+            statusCode = _server.Install(Package.Discord, 1);
+            return statusCode;
+        }
+        else
+        {
+            throw new ArgumentException("Received an invalid selection");
         }
 
-        statusCode = _server.GetResponse(out IResponseCommand? response);
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
-        return response!.StatusCode;
+        return statusCode;
     }
     
     public int GotoStep(ContinueOptions options)
     {
-        int statusCode = _server.ConnectToServer();
-        // TODO: Handle status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
-        // TODO: Find a way to always have a response command after each send command
-        // TODO: Handle status code
-        statusCode = _server.SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = false });
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
-        statusCode = _server.GetResponse(out IResponseCommand? response);
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
         // TODO: Use some lookup or something idk
+        int statusCode = 0;
         if (options.Package == "discord")
         {
-            // TODO: Handle status code
-            _server.SendCommand(new InstallCommand
-            {
-                Package = Package.Discord,
-                Stage = options.Stage,
-                Data = options.DataPath,
-                DisconnectAfter = true
-            });
+            statusCode = _server.Install(Package.Discord, options.Stage, options.DataPath);
         }
         else
         {
             throw new NotImplementedException();
         }
-        
-        statusCode = _server.GetResponse(out IResponseCommand? response1);
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
 
-        return response1!.StatusCode;
+        return statusCode;
     }
 
     public int PopStack(PopStackOptions options)
     {
-        int statusCode = _server.ConnectToServer();
-        // TODO: Handle status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Handle status code
-        _server.SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = true });
-        
-        statusCode = _server.GetResponse(out IResponseCommand? response);
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
-        return response!.StatusCode;
-    }
-
-    public int PushStack(PushStackOptions options)
-    {
-        // Utilities.GetOrCreateStacks(options.BaseStackPath);
-        // string tmpNodePath = $"{Utilities.ProgramStack.Path}.tmp";
-        // string content = File.ReadAllText(tmpNodePath);
-        // Utilities.ProgramStack.Push(content);
-        // File.Delete(tmpNodePath);
-        //
-        // return 0;
-        throw new NotImplementedException();
+        return _server.PopStack(1);
     }
 
     public int Finalise(FinaliseOptions options)
     {
-        int statusCode = _server.ConnectToServer();
-        // TODO: Handle status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Handle status code
-        statusCode = _server.SendCommand(new FinaliseCommand());
-        // TODO: Handle the status code
-        if (statusCode != 0)
-        {
-            throw new NotImplementedException();
-        }
-        
-        return 0;
+        return _server.DisconnectFromServer();
     }
 }

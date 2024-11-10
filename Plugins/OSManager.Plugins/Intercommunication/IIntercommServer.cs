@@ -1,12 +1,15 @@
 using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.Plugins.Intercommunication;
 
 public interface IIntercommServer
 {
-    public int ConnectToServer();
+    public int ConnectToServer(string sessionId, string slavePath);
 
-    public int SendCommand(ICommand command);
+    public int Install(Package package, int stage, string? data = null);
+    
+    public int PopStack(int count);
 
-    public int GetResponse(out IResponseCommand? response);
+    public int DisconnectFromServer();
 }

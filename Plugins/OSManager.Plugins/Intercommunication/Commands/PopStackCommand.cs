@@ -3,7 +3,7 @@ using ProtoBuf;
 namespace OSManager.Plugins.Intercommunication.Commands;
 
 [ProtoContract]
-public class PopStackCommand : IPopStackCommand
+public class PopStackCommand : ICommand
 {
     [ProtoMember(1)]
     public int Count { get; set; }

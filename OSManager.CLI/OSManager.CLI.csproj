@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\OSManager.Core\OSManager.Core.csproj" />
       <ProjectReference Include="..\Plugins\OSManager.Communications.Proto\OSManager.Communications.Proto.csproj" />
+      <ProjectReference Include="..\Plugins\OSManager.Plugins\OSManager.Plugins.csproj" />
     </ItemGroup>
 
     <ItemGroup>

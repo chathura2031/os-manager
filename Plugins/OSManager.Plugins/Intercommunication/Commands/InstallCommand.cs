@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace OSManager.Plugins.Intercommunication.Commands;
 
 [ProtoContract]
-public class InstallCommand : IInstallCommand
+public class InstallCommand : ICommand
 {
     [ProtoMember(1)]
     public Package Package { get; set; }

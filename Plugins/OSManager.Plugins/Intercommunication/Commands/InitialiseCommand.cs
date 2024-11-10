@@ -3,7 +3,7 @@ using ProtoBuf;
 namespace OSManager.Plugins.Intercommunication.Commands;
 
 [ProtoContract]
-public class InitialiseCommand : IInitialiseCommand
+public class InitialiseCommand : ICommand
 {
     [ProtoMember(1)]
     public string SlavePath { get; set; }
