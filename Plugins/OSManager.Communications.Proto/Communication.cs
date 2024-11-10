@@ -1,7 +1,5 @@
 using OSManager.Communications.Proto.Enums;
 using OSManager.Communications.Proto.Extensions;
-using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Enums;
 using ProtoBuf;
 
 namespace OSManager.Communications.Proto;

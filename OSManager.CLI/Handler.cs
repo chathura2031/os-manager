@@ -1,22 +1,20 @@
 using System.Reflection;
 using OSManager.CLI.CliOptions;
+using OSManager.Core.Enums;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.CLI;
 
-public class Stuff(IIntercommClient client)
+// TODO: Use dependency injection
+public class Handler(IIntercommClient client)
 {
-    // TODO: Use dependency injection
-    private readonly IIntercommClient _client = client;
-    
     public int Initialise(InitialiseOptions options)
     {
         AssemblyName assembly = Assembly.GetEntryAssembly()!.GetName();
         Console.WriteLine($"Version {assembly.Version}");
 
         // TODO: Handle status code
-        int statusCode = _client.ConnectToServer(options.BaseStackPath, options.SlavePath);
+        int statusCode = client.ConnectToServer(options.BaseStackPath, options.SlavePath);
         if (statusCode != 0)
         {
             throw new NotImplementedException();
@@ -26,7 +24,7 @@ public class Stuff(IIntercommClient client)
         int selection = 0;
         if (selection == 0)
         {
-            statusCode = _client.Install(Package.Discord, 1);
+            statusCode = client.Install(Package.Discord, 1);
             return statusCode;
         }
         else
@@ -43,7 +41,7 @@ public class Stuff(IIntercommClient client)
         int statusCode = 0;
         if (options.Package == "discord")
         {
-            statusCode = _client.Install(Package.Discord, options.Stage, options.DataPath);
+            statusCode = client.Install(Package.Discord, options.Stage, options.DataPath);
         }
         else
         {
@@ -55,11 +53,11 @@ public class Stuff(IIntercommClient client)
 
     public int PopStack(PopStackOptions options)
     {
-        return _client.PopStack(1);
+        return client.PopStack(1);
     }
 
     public int Finalise(FinaliseOptions options)
     {
-        return _client.DisconnectFromServer();
+        return client.DisconnectFromServer();
     }
 }

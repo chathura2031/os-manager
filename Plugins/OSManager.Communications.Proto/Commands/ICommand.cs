@@ -1,4 +1,4 @@
-namespace OSManager.Plugins.Intercommunication.Commands;
+namespace OSManager.Communications.Proto.Commands;
 
 public interface ICommand
 {

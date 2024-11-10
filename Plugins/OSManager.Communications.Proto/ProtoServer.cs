@@ -1,6 +1,6 @@
 using System.IO.Pipes;
+using OSManager.Communications.Proto.Commands;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Commands;
 using OSManager.Plugins.Intercommunication.EventArgs;
 
 namespace OSManager.Communications.Proto;

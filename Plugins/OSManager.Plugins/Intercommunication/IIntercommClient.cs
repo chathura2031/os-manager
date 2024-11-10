@@ -1,4 +1,4 @@
-using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Core.Enums;
 
 namespace OSManager.Plugins.Intercommunication;
 

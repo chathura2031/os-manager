@@ -1,7 +1,7 @@
-using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Core.Enums;
 using ProtoBuf;
 
-namespace OSManager.Plugins.Intercommunication.Commands;
+namespace OSManager.Communications.Proto.Commands;
 
 [ProtoContract]
 public class InstallCommand : ICommand

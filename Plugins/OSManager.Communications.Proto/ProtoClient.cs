@@ -1,7 +1,7 @@
 ﻿using System.IO.Pipes;
+using OSManager.Communications.Proto.Commands;
+using OSManager.Core.Enums;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.Communications.Proto;
 

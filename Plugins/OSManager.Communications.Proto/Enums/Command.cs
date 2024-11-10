@@ -1,5 +1,5 @@
+using OSManager.Communications.Proto.Commands;
 using OSManager.Communications.Proto.Extensions;
-using OSManager.Plugins.Intercommunication.Commands;
 
 namespace OSManager.Communications.Proto.Enums;
 

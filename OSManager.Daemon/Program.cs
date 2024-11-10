@@ -1,8 +1,8 @@
 ﻿using OSManager.Communications.Proto;
+using OSManager.Core.Enums;
 using OSManager.Daemon;
 using OSManager.Daemon.Packages;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Enums;
 using OSManager.Plugins.Intercommunication.EventArgs;
 
 void OnInitialise(object? sender, InitialiseEventArgs initialiseEventArgs)
