@@ -4,8 +4,8 @@ using OSManager.CLI.CliOptions;
 using OSManager.Communications.Proto;
 using OSManager.Plugins.Intercommunication;
 
-IIntercommServer server = new ProtoServer("PipesOfPiece");
-Stuff stuff = new(server);
+IIntercommClient client = new ProtoClient("PipesOfPiece");
+Stuff stuff = new(client);
 
 // TODO: Figure out a way to avoid having the types in angle brackets and in the map result
 return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, ContinueOptions, PopStackOptions, FinaliseOptions>(args)

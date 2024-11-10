@@ -1,21 +1,22 @@
-﻿using System.IO.Pipes;
+using System.IO.Pipes;
 using OSManager.Plugins.Intercommunication;
 using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.Communications.Proto;
 
 public class ProtoServer : IIntercommServer
 {
-    private readonly NamedPipeClientStream? _client;
-    private readonly BinaryReader? _reader;
-    private readonly BinaryWriter? _writer;
+    private readonly NamedPipeServerStream _server;
+    private readonly BinaryWriter _writer;
+    private readonly BinaryReader _reader;
 
-    public ProtoServer(string pipeName)
+    public bool IsConnected => _server.IsConnected;
+
+    public ProtoServer()
     {
-        _client = new(pipeName);
-        _writer = new(_client);
-        _reader = new(_client);
+        _server = new("PipesOfPiece");
+        _writer = new(_server);
+        _reader = new(_server);
     }
 
     ~ProtoServer()
@@ -25,156 +26,37 @@ public class ProtoServer : IIntercommServer
 
     private void Terminate()
     {
-        _client?.Dispose();
-    }
-    
-    private int ConnectToServer()
-    {
-        try
-        {
-            _client!.Connect(1000);
-        }
-        catch (Exception e)
-        {
-            return 1;
-        }
-        
-        return 0;
+        _server.Disconnect();
     }
 
-    public int ConnectToServer(string sessionId, string slavePath)
+    public async Task WaitForClient()
     {
-        int statusCode = ConnectToServer();
-        if (statusCode != 0)
-        {
-            return 1;
-        }
-
-        statusCode = SendCommand(new InitialiseCommand()
-        {
-            SlavePath = slavePath,
-            BaseStackPath = sessionId
-        });
-
-        return statusCode;
+        await _server.WaitForConnectionAsync();
     }
 
-    private int SendCommand(ICommand command)
+    public Task<ICommand> ReceiveCommand()
     {
-        byte[] data = Communication.Serialize(command);
-
-        try
-        {
-            _writer!.Write(data);
-            _writer!.Flush();
-        }
-        catch (Exception e)
-        {
-            // TODO: Log error somewhere
-            return 1;
-        }
-
-        return 0;
+        byte[] data = Communication.GetData(_reader);
+        return Task.FromResult((ICommand)Communication.Deserialize(data, out Type type));
     }
 
-    // TODO: Implement function to simplify handling the status codes
-    public int Install(Package package, int stage, string? data = null)
+    public Task SendResponse(int statusCode)
     {
-        int statusCode;
-        if (stage == 0 && !_client!.IsConnected)
+        byte[] binary = Communication.Serialize(new ResponseCommand()
         {
-            throw new Exception("A connection to the server should already be established but was not.");
-        }
-
-        if (stage == 0)
-        {
-            throw new Exception("Stage 0 is not valid");
-        }
-        else if (stage > 1)
-        {
-            statusCode = ConnectToServer();
-            if (statusCode != 0)
-            {
-                return statusCode;
-            }
-            
-            // Remove the bash command that triggered this stage
-            statusCode = SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = false });
-            if (statusCode != 0)
-            {
-                return statusCode;
-            }
-            
-            statusCode = GetResponse(out ResponseCommand? response);
-            if (statusCode != 0)
-            {
-                return statusCode;
-            }
-        }
-
-        statusCode = SendCommand(new InstallCommand()
-        {
-            Package = package,
-            Stage = stage,
-            Data = data,
-            DisconnectAfter = true
+            StatusCode = statusCode
         });
         
-        if (statusCode != 0)
-        {
-            return statusCode;
-        }
+        _writer.Write(binary);
+        _writer.Flush();
         
-        statusCode = GetResponse(out ResponseCommand? response1);
-        
-        return statusCode != 0 ? statusCode : response1!.StatusCode;
+        return Task.CompletedTask;
     }
 
-    public int PopStack(int count)
+    public Task DisconnectFromClient()
     {
-        int statusCode = ConnectToServer();
-        if (statusCode != 0)
-        {
-            return statusCode;
-        }
-
-        statusCode = SendCommand(new PopStackCommand { Count = count, DisconnectAfter = true });
-        if (statusCode != 0)
-        {
-            return statusCode;
-        }
+        _server.Disconnect();
         
-        statusCode = GetResponse(out ResponseCommand? response);
-        
-        return statusCode != 0 ? statusCode : response!.StatusCode;
-    }
-
-    private int GetResponse(out ResponseCommand? response)
-    {
-        try
-        {
-            response = (ResponseCommand)Communication.Deserialize(Communication.GetData((BinaryReader)_reader!),
-                out Type type);
-        }
-        catch (Exception e)
-        {
-            // TODO: Log the error somewhere
-            response = null;
-            return 1;
-        }
-
-        return 0;
-    }
-    
-    public int DisconnectFromServer()
-    {
-        int statusCode = ConnectToServer();
-        if (statusCode != 0)
-        {
-            return statusCode;
-        }
-
-        statusCode = SendCommand(new FinaliseCommand());
-        return statusCode;
+        return Task.CompletedTask;
     }
 }

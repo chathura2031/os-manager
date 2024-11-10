@@ -10,17 +10,17 @@ Task.Delay(1000).Wait();
 
 async Task StartServer(CancellationToken stoppingToken)
 {
-    IIntercommClient client = new ProtoClient();
+    IIntercommServer server = new ProtoServer();
     
     // TODO: Move all communication stuff into the proto plugin
     while (true)
     {
-        if (!client.IsConnected)
+        if (!server.IsConnected)
         {
-            await client.WaitForClient();
+            await server.WaitForClient();
         }
 
-        ICommand data = await client.ReceiveCommand();
+        ICommand data = await server.ReceiveCommand();
 
         if (data.GetType() == typeof(InitialiseCommand))
         {
@@ -41,11 +41,11 @@ async Task StartServer(CancellationToken stoppingToken)
                 throw new NotImplementedException();
             }
 
-            await client.SendResponse(statusCode);
+            await server.SendResponse(statusCode);
 
             if (installCommand.DisconnectAfter)
             {
-                await client.DisconnectFromClient();
+                await server.DisconnectFromClient();
             }
         }
         else if (data.GetType() == typeof(PopStackCommand))
@@ -56,17 +56,17 @@ async Task StartServer(CancellationToken stoppingToken)
                 Utilities.BashStack.Pop();
             }
 
-            await client.SendResponse(0);
+            await server.SendResponse(0);
             
             if (popCommand.DisconnectAfter)
             {
-                await client.DisconnectFromClient();
+                await server.DisconnectFromClient();
             }
         }
         else if (data.GetType() == typeof(FinaliseCommand))
         {
             Utilities.DeleteStacks();
-            await client.DisconnectFromClient();
+            await server.DisconnectFromClient();
         }
         else
         {
