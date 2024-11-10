@@ -77,15 +77,27 @@ public class ProtoClient : IIntercommClient
         return 0;
     }
 
+    private int SendCommandAndAwaitResponse(ICommand command)
+    {
+        int statusCode = SendCommand(command);
+        if (statusCode != 0)
+        {
+            return statusCode;
+        }
+        
+        statusCode = GetResponse(out ResponseCommand? response);
+        return statusCode != 0 ? statusCode : response!.StatusCode;
+    }
+
     // TODO: Implement function to simplify handling the status codes
     public int Install(Package package, int stage, string? data = null)
     {
-        int statusCode;
         if (stage == 0 && !_client!.IsConnected)
         {
             throw new Exception("A connection to the server should already be established but was not.");
         }
 
+        int statusCode = 0;
         if (stage == 0)
         {
             throw new Exception("Stage 0 is not valid");
@@ -99,35 +111,26 @@ public class ProtoClient : IIntercommClient
             }
             
             // Remove the bash command that triggered this stage
-            statusCode = SendCommand(new PopStackCommand { Count = 1, DisconnectAfter = false });
-            if (statusCode != 0)
+            statusCode = SendCommandAndAwaitResponse(new PopStackCommand
             {
-                return statusCode;
-            }
+                Count = 1,
+                DisconnectAfter = false
+            });
             
-            statusCode = GetResponse(out ResponseCommand? response);
             if (statusCode != 0)
             {
                 return statusCode;
             }
         }
 
-        statusCode = SendCommand(new InstallCommand()
+        // Send the install command
+        return SendCommandAndAwaitResponse(new InstallCommand()
         {
             Package = package,
             Stage = stage,
             Data = data,
             DisconnectAfter = true
         });
-        
-        if (statusCode != 0)
-        {
-            return statusCode;
-        }
-        
-        statusCode = GetResponse(out ResponseCommand? response1);
-        
-        return statusCode != 0 ? statusCode : response1!.StatusCode;
     }
 
     public int PopStack(int count)
@@ -138,15 +141,11 @@ public class ProtoClient : IIntercommClient
             return statusCode;
         }
 
-        statusCode = SendCommand(new PopStackCommand { Count = count, DisconnectAfter = true });
-        if (statusCode != 0)
+        return SendCommandAndAwaitResponse(new PopStackCommand
         {
-            return statusCode;
-        }
-        
-        statusCode = GetResponse(out ResponseCommand? response);
-        
-        return statusCode != 0 ? statusCode : response!.StatusCode;
+            Count = count,
+            DisconnectAfter = true
+        });
     }
 
     private int GetResponse(out ResponseCommand? response)
