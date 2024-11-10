@@ -1,7 +1,7 @@
+using OSManager.Communications.Proto.Extensions;
 using OSManager.Plugins.Intercommunication.Commands;
-using OSManager.Plugins.Intercommunication.Extensions;
 
-namespace OSManager.Plugins.Intercommunication.Enums;
+namespace OSManager.Communications.Proto.Enums;
 
 public enum Command
 {

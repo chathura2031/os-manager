@@ -2,75 +2,47 @@
 using OSManager.Daemon;
 using OSManager.Daemon.Packages;
 using OSManager.Plugins.Intercommunication;
-using OSManager.Plugins.Intercommunication.Commands;
 using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Plugins.Intercommunication.EventArgs;
 
-await StartServer(new CancellationToken());
-Task.Delay(1000).Wait();
-
-async Task StartServer(CancellationToken stoppingToken)
+void OnInitialise(object? sender, InitialiseEventArgs initialiseEventArgs)
 {
-    IIntercommServer server = new ProtoServer();
-    
-    // TODO: Move all communication stuff into the proto plugin
-    while (true)
+    Utilities.SlavePath = initialiseEventArgs.SlavePath;
+    Utilities.GetOrCreateStacks(initialiseEventArgs.SessionId, true);
+}
+
+void OnInstall(object? sender, InstallEventArgs installEventArgs)
+{
+    if (installEventArgs.Package == Package.Discord)
     {
-        if (!server.IsConnected)
-        {
-            await server.WaitForClient();
-        }
-
-        ICommand data = await server.ReceiveCommand();
-
-        if (data.GetType() == typeof(InitialiseCommand))
-        {
-            var initialiseCommand = (InitialiseCommand)data;
-            Utilities.SlavePath = initialiseCommand.SlavePath;
-            Utilities.GetOrCreateStacks(initialiseCommand.BaseStackPath, true);
-        }
-        else if (data.GetType() == typeof(InstallCommand))
-        {
-            var installCommand = (InstallCommand)data;
-            int statusCode;
-            if (installCommand.Package == Package.Discord)
-            {
-                statusCode = Discord.Instance.Install(installCommand.Stage, installCommand.Data ?? string.Empty);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-
-            await server.SendResponse(statusCode);
-
-            if (installCommand.DisconnectAfter)
-            {
-                await server.DisconnectFromClient();
-            }
-        }
-        else if (data.GetType() == typeof(PopStackCommand))
-        {
-            var popCommand = (PopStackCommand)data;
-            for (int i = 0; i < popCommand.Count; i++)
-            {
-                Utilities.BashStack.Pop();
-            }
-
-            await server.SendResponse(0);
-            
-            if (popCommand.DisconnectAfter)
-            {
-                await server.DisconnectFromClient();
-            }
-        }
-        else if (data.GetType() == typeof(FinaliseCommand))
-        {
-            Utilities.DeleteStacks();
-            await server.DisconnectFromClient();
-        }
-        else
-        {
-            throw new NotImplementedException();
-        }
+        installEventArgs.StatusCode = Discord.Instance.Install(installEventArgs.Stage, installEventArgs.Data ?? string.Empty);
+    }
+    else
+    {
+        throw new NotImplementedException();
     }
 }
+
+void OnStackPop(object? sender, PopStackEventArgs popStackEventArgs)
+{
+    for (int i = 0; i < popStackEventArgs.Count; i++)
+    {
+        Utilities.BashStack.Pop();
+    }
+
+    popStackEventArgs.StatusCode = 0;
+}
+
+void OnFinalise(object? sender, System.EventArgs eventArgs)
+{
+    Utilities.DeleteStacks();
+}
+
+IIntercommServer server = new ProtoServer();
+
+server.OnInitialise += OnInitialise;
+server.OnInstall += OnInstall;
+server.OnStackPop += OnStackPop;
+server.OnFinalise += OnFinalise;
+
+await server.StartServer();

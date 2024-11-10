@@ -1,4 +1,4 @@
-namespace OSManager.Plugins.Intercommunication.Extensions;
+namespace OSManager.Communications.Proto.Extensions;
 
 public static class EnumExtensions
 {

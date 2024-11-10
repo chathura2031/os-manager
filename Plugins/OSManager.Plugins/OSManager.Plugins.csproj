@@ -10,4 +10,8 @@
       <PackageReference Include="protobuf-net.Core" Version="3.2.45" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Intercommunication\Extensions\" />
+    </ItemGroup>
+
 </Project>

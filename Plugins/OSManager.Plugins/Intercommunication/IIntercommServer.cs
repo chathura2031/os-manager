@@ -1,16 +1,13 @@
-using OSManager.Plugins.Intercommunication.Commands;
+using OSManager.Plugins.Intercommunication.EventArgs;
 
 namespace OSManager.Plugins.Intercommunication;
 
 public interface IIntercommServer
 {
-    public bool IsConnected { get; }
-    
-    public Task WaitForClient();
-    
-    public Task<ICommand> ReceiveCommand();
+    public event EventHandler<InitialiseEventArgs> OnInitialise;
+    public event EventHandler<PopStackEventArgs> OnStackPop;
+    public event EventHandler OnFinalise;
+    public event EventHandler<InstallEventArgs> OnInstall;
 
-    public Task SendResponse(int statusCode);
-
-    public Task DisconnectFromClient();
+    public Task StartServer();
 }

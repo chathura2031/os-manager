@@ -1,6 +1,6 @@
-using OSManager.Plugins.Intercommunication.Enums;
+using OSManager.Communications.Proto.Enums;
 
-namespace OSManager.Plugins.Intercommunication.Extensions;
+namespace OSManager.Communications.Proto.Extensions;
 
 public static class CommandExtensions
 {
