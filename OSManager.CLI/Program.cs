@@ -4,6 +4,7 @@ using OSManager.CLI.CliOptions;
 using OSManager.Communications.Proto;
 using OSManager.Plugins.Intercommunication;
 
+// TODO: Use dependency injection
 IIntercommClient client = new ProtoClient("PipesOfPiece");
 Handler handler = new(client);
 

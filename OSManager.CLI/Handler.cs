@@ -5,7 +5,6 @@ using OSManager.Plugins.Intercommunication;
 
 namespace OSManager.CLI;
 
-// TODO: Use dependency injection
 public class Handler(IIntercommClient client)
 {
     public int Initialise(InitialiseOptions options)
