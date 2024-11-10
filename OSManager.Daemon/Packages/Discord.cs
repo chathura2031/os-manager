@@ -21,7 +21,7 @@ public class Discord : IPackage
         }
 
         int statusCode = Utilities.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{Name}.deb", out filePath);
+            $"{Name}.deb", out filePath, $"/tmp/osman-{Guid.NewGuid()}");
 
         return statusCode;
     }

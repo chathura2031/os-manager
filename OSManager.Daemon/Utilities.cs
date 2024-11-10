@@ -47,6 +47,11 @@ public static class Utilities
     /// <returns>A status code</returns>
     public static int DownloadFromUrl(string url, string fileName, out string filePath, string? downloadDirectory = null, bool promptReplacement = false)
     {
+        if (downloadDirectory != null)
+        {
+            Directory.CreateDirectory(downloadDirectory);
+        }
+        
         downloadDirectory ??= Directory.GetCurrentDirectory();
         filePath = Path.Join(downloadDirectory, fileName);
         bool cancelOperation = false;
