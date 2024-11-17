@@ -13,6 +13,7 @@ public class ProtoServer : IIntercommServer
 
     public event EventHandler<InitialiseEventArgs>? OnInitialise;
     public event EventHandler<PopStackEventArgs>? OnStackPop;
+    public event EventHandler<PushStackEventArgs>? OnStackPush;
     public event EventHandler? OnFinalise;
     public event EventHandler<InstallEventArgs>? OnInstall;
 
@@ -86,6 +87,11 @@ public class ProtoServer : IIntercommServer
                     };
                     OnInitialise.Invoke(this, e);
                 }
+                
+                if (initialiseCommand.DisconnectAfter)
+                {
+                    DisconnectFromClient();
+                }
             }
             else if (data.GetType() == typeof(InstallCommand))
             {
@@ -124,6 +130,25 @@ public class ProtoServer : IIntercommServer
                 }
                 
                 if (popCommand.DisconnectAfter)
+                {
+                    DisconnectFromClient();
+                }
+            }
+            else if (data.GetType() == typeof(PushStackCommand))
+            {
+                var pushCommand = (PushStackCommand)data;
+                if (OnStackPush != null)
+                {
+                    PushStackEventArgs e = new()
+                    {
+                        Content = pushCommand.Content
+                    };
+                    
+                    OnStackPush.Invoke(this, e);
+                    SendResponse(e.StatusCode);
+                }
+
+                if (pushCommand.DisconnectAfter)
                 {
                     DisconnectFromClient();
                 }

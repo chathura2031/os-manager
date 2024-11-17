@@ -2,6 +2,7 @@
 using OSManager.Communications.Proto.Commands;
 using OSManager.Core.Enums;
 using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.Communications.Proto;
 
@@ -30,6 +31,11 @@ public class ProtoClient : IIntercommClient
     
     private int ConnectToServer()
     {
+        if (_client!.IsConnected)
+        {
+            return 0;
+        }
+        
         try
         {
             _client!.Connect(1000);
@@ -53,7 +59,8 @@ public class ProtoClient : IIntercommClient
         statusCode = SendCommand(new InitialiseCommand()
         {
             SlavePath = slavePath,
-            BaseStackPath = sessionId
+            BaseStackPath = sessionId,
+            DisconnectAfter = false
         });
 
         return statusCode;
@@ -92,28 +99,23 @@ public class ProtoClient : IIntercommClient
     // TODO: Implement function to simplify handling the status codes
     public int Install(Package package, int stage, string? data = null)
     {
-        if (stage == 0 && !_client!.IsConnected)
+        int statusCode = ConnectToServer();
+        if (statusCode != 0)
         {
-            throw new Exception("A connection to the server should already be established but was not.");
+            return statusCode;
         }
-
-        int statusCode = 0;
+            
         if (stage == 0)
         {
             throw new Exception("Stage 0 is not valid");
         }
         else if (stage > 1)
         {
-            statusCode = ConnectToServer();
-            if (statusCode != 0)
-            {
-                return statusCode;
-            }
-            
             // Remove the bash command that triggered this stage
             statusCode = SendCommandAndAwaitResponse(new PopStackCommand
             {
                 Count = 1,
+                Stack = StackType.BashStack,
                 DisconnectAfter = false
             });
             
@@ -133,7 +135,7 @@ public class ProtoClient : IIntercommClient
         });
     }
 
-    public int PopStack(int count)
+    public int PopStack(int count, StackType stack)
     {
         int statusCode = ConnectToServer();
         if (statusCode != 0)
@@ -144,7 +146,22 @@ public class ProtoClient : IIntercommClient
         return SendCommandAndAwaitResponse(new PopStackCommand
         {
             Count = count,
+            Stack = stack,
             DisconnectAfter = true
+        });
+    }
+
+    public int PushStack(string content)
+    {
+        int statusCode = ConnectToServer();
+        if (statusCode != 0)
+        {
+            return statusCode;
+        }
+
+        return SendCommandAndAwaitResponse(new PushStackCommand()
+        {
+            Content = content
         });
     }
 

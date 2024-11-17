@@ -1,6 +1,7 @@
 using OSManager.Core.Enums;
 using OSManager.Daemon.Packages;
 using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Enums;
 using OSManager.Plugins.Intercommunication.EventArgs;
 
 namespace OSManager.Daemon;
@@ -12,6 +13,7 @@ public class Handler
         server.OnInitialise += OnInitialise;
         server.OnInstall += OnInstall;
         server.OnStackPop += OnStackPop;
+        server.OnStackPush += OnStackPush;
         server.OnFinalise += OnFinalise;
     }
     
@@ -37,10 +39,27 @@ public class Handler
     {
         for (int i = 0; i < popStackEventArgs.Count; i++)
         {
-            Utilities.BashStack.Pop();
+            if (popStackEventArgs.Stack == StackType.BashStack)
+            {
+                Utilities.BashStack.Pop();
+            }
+            else if (popStackEventArgs.Stack == StackType.ProgramStack)
+            {
+                Utilities.ProgramStack.Pop();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         popStackEventArgs.StatusCode = 0;
+    }
+
+    void OnStackPush(object? sender, PushStackEventArgs pushStackEventArgs)
+    {
+        Utilities.ProgramStack.Push(pushStackEventArgs.Content);
+        pushStackEventArgs.StatusCode = 0;
     }
 
     void OnFinalise(object? sender, System.EventArgs eventArgs)

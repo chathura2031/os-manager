@@ -13,7 +13,7 @@ public static class StackExtensions
     public static void PushBashCommand(this FatStack stack, string command, bool useSudo = false)
     {
         string bashCommand = useSudo ? "sudo " : "";
-        bashCommand += $"{command} && ./{Utilities.SlavePath} popstack --count 1";
+        bashCommand += $"{command} && ./{Utilities.SlavePath} popstack --stack bash --count 1";
         stack.Push(bashCommand);
     }
 

@@ -14,6 +14,9 @@ public enum Command
     [Type(typeof(PopStackCommand))]
     PopStackCommand,
     
+    [Type(typeof(PushStackCommand))]
+    PushStackCommand,
+    
     [Type(typeof(ResponseCommand))]
     ResponseCommand,
     

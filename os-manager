@@ -55,8 +55,6 @@ while [[ $? == 0 ]] ; do
         terminate $manager 1
     fi
 
-    echo "Running new command... press enter "
-    read
     eval $command
 
     if [[ $? != 0 ]]; then

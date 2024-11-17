@@ -2,6 +2,7 @@ using System.Reflection;
 using OSManager.CLI.CliOptions;
 using OSManager.Core.Enums;
 using OSManager.Plugins.Intercommunication;
+using OSManager.Plugins.Intercommunication.Enums;
 
 namespace OSManager.CLI;
 
@@ -52,7 +53,19 @@ public class Handler(IIntercommClient client)
 
     public int PopStack(PopStackOptions options)
     {
-        return client.PopStack(1);
+        StackType stack = options.Stack switch
+        {
+            "bash" => StackType.BashStack,
+            "program" => StackType.ProgramStack,
+            _ => throw new NotImplementedException()
+        };
+
+        return client.PopStack(1, stack);
+    }
+
+    public int PushStack(PushStackOptions options)
+    {
+        return client.PushStack(options.Content);
     }
 
     public int Finalise(FinaliseOptions options)
