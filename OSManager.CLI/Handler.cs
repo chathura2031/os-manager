@@ -9,6 +9,42 @@ namespace OSManager.CLI;
 
 public class Handler(IIntercommClient client)
 {
+    public Package GetPackageToInstall()
+    {
+        List<Package> packages = new();
+        // Get all non-internal packages
+        foreach (Package package in Enum.GetValues(typeof(Package)))
+        {
+            string enumName = package.ToString();
+            if (enumName.Length >= 9 && enumName.Substring(0, 9) == "INTERNAL_")
+            {
+                continue;
+            }
+            
+            packages.Add(package);
+        }
+
+        Console.WriteLine("##################################################");
+        for (int i = 0; i < packages.Count; i++)
+        {
+            Console.WriteLine($"{i+1}. {packages[i].PrettyName()}");
+        }
+
+        while (true)
+        {
+            Console.Write($"Please enter a value between 1 and {packages.Count} to select a package to install: ");
+            bool success = int.TryParse(Console.ReadLine(), out int selection);
+
+            if (!success || selection < 1 || selection > packages.Count)
+            {
+                Console.WriteLine("Invalid selection. Try again.");
+                continue;
+            }
+
+            return packages[selection-1];
+        }
+    }
+    
     public int Initialise(InitialiseOptions options)
     {
         AssemblyName assembly = Assembly.GetEntryAssembly()!.GetName();
@@ -20,20 +56,9 @@ public class Handler(IIntercommClient client)
         {
             throw new NotImplementedException();
         }
-        
-        // TODO: Add ability for the user to select what to do here
-        int selection = 0;
-        if (selection == 0)
-        {
-            statusCode = client.Install(Package.Discord, 1);
-            return statusCode;
-        }
-        else
-        {
-            throw new ArgumentException("Received an invalid selection");
-        }
 
-        return statusCode;
+        Package packageToInstall = GetPackageToInstall();
+        return client.Install(packageToInstall, 1);
     }
     
     public int GotoStep(ContinueOptions options)
