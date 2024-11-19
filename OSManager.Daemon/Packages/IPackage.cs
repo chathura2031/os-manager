@@ -1,10 +1,10 @@
+using OSManager.Core.Enums;
+
 namespace OSManager.Daemon.Packages;
 
 public interface IPackage
 {
-    string Name { get; }
-    
-    string HumanReadableName { get; }
+    Package Package { get; }
     
     List<IPackage> Dependencies { get; }
     

@@ -1,13 +1,15 @@
+using OSManager.Core.Enums;
+using OSManager.Core.Extensions;
+using OSManager.Daemon.Extensions;
+
 namespace OSManager.Daemon.Packages;
 
 public class Discord : IPackage
 {
     public static readonly Discord Instance = new();
+
+    public Package Package { get; } = Package.Discord;
     
-    public string Name { get; } = "discord";
-
-    public string HumanReadableName { get; } = "Discord";
-
     public List<IPackage> Dependencies { get; } = [];
     
     public List<IPackage> OptionalExtras { get; } = [];
@@ -21,7 +23,7 @@ public class Discord : IPackage
         }
 
         int statusCode = Utilities.DownloadFromUrl("https://discord.com/api/download?platform=linux&format=deb",
-            $"{Name}.deb", out filePath, $"/tmp/osman-{Guid.NewGuid()}");
+            $"{Package.Name()}.deb", out filePath, $"/tmp/osman-{Guid.NewGuid()}");
 
         return statusCode;
     }
@@ -43,12 +45,11 @@ public class Discord : IPackage
         int statusCode = 0;
         switch (stage)
         {
-            case 0:
-                Utilities.BashStack.PushNextStage(stage + 1, Name);
-                // TODO
-                // this.InstallDependencies();
-                break;
             case 1:
+                Utilities.BashStack.PushNextStage(stage + 1, Package.Name());
+                this.InstallDependencies();
+                break;
+            case 2:
                 statusCode = DownloadPackage(2, out string filePath);
                 if (statusCode != 0)
                 {
@@ -61,10 +62,10 @@ public class Discord : IPackage
                 // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"apt install -y --fix-broken {filePath}", true),
-                    () => Utilities.BashStack.PushNextStage(stage + 1, Name, filePath),
+                    () => Utilities.BashStack.PushNextStage(stage + 1, Package.Name(), filePath),
                 ]);
                 break;
-            case 2:
+            case 3:
                 statusCode = DeletePackage(2, data);
                 if (statusCode != 0)
                 {
@@ -73,7 +74,7 @@ public class Discord : IPackage
                 }
                 break;
             default:
-                throw new ArgumentException($"{HumanReadableName} does not have {stage} stages of installation.");
+                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of installation.");
         }
 
         return statusCode;

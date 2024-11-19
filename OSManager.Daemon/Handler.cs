@@ -25,14 +25,8 @@ public class Handler
 
     void OnInstall(object? sender, InstallEventArgs installEventArgs)
     {
-        if (installEventArgs.Package == Package.Discord)
-        {
-            installEventArgs.StatusCode = Discord.Instance.Install(installEventArgs.Stage, installEventArgs.Data ?? string.Empty);
-        }
-        else
-        {
-            throw new NotImplementedException();
-        }
+        IPackage package = PackageRepository.GetPackage(installEventArgs.Package);
+        package.Install(installEventArgs.Stage, installEventArgs.Data ?? string.Empty);
     }
 
     void OnStackPop(object? sender, PopStackEventArgs popStackEventArgs)

@@ -11,7 +11,7 @@ public interface IIntercommClient
     
     public int PopStack(int count, StackType stack);
     
-    public int PushStack(string content);
+    public int PushStack(string[] content);
 
     public int DisconnectFromServer();
 }

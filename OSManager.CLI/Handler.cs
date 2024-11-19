@@ -1,6 +1,7 @@
 using System.Reflection;
 using OSManager.CLI.CliOptions;
 using OSManager.Core.Enums;
+using OSManager.Core.Extensions;
 using OSManager.Plugins.Intercommunication;
 using OSManager.Plugins.Intercommunication.Enums;
 
@@ -37,18 +38,15 @@ public class Handler(IIntercommClient client)
     
     public int GotoStep(ContinueOptions options)
     {
-        // TODO: Use some lookup or something idk
-        int statusCode = 0;
-        if (options.Package == "discord")
+        foreach (Package package in Enum.GetValues(typeof(Package)))
         {
-            statusCode = client.Install(Package.Discord, options.Stage, options.DataPath);
+            if (options.Package == package.Name())
+            {
+                return client.Install(package, options.Stage, options.DataPath);
+            }
         }
-        else
-        {
-            throw new NotImplementedException();
-        }
-
-        return statusCode;
+        
+        throw new NotImplementedException();
     }
 
     public int PopStack(PopStackOptions options)
@@ -65,7 +63,21 @@ public class Handler(IIntercommClient client)
 
     public int PushStack(PushStackOptions options)
     {
-        return client.PushStack(options.Content);
+        string[] content;
+        if (options.FilePath != null)
+        {
+            content = File.ReadAllLines(options.FilePath);
+        }
+        else if (options.Content != null)
+        {
+            content = [options.Content];
+        }
+        else
+        {
+            throw new Exception("Either content or a file path must be provided");
+        }
+        
+        return client.PushStack(content);
     }
 
     public int Finalise(FinaliseOptions options)

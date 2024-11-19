@@ -151,7 +151,7 @@ public class ProtoClient : IIntercommClient
         });
     }
 
-    public int PushStack(string content)
+    public int PushStack(string[] content)
     {
         int statusCode = ConnectToServer();
         if (statusCode != 0)
