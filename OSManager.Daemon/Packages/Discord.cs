@@ -58,8 +58,6 @@ public class Discord : IPackage
                     return 1;
                 }
                 
-                // TODO: Check status code of previous bash command -- will probably need to create a cache for the script to write the return code to
-                // TODO: Convert the data field to a path to a file
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"apt install -y --fix-broken {filePath}", true),
                     () => Utilities.BashStack.PushNextStage(stage + 1, Package.Name(), filePath),

@@ -19,7 +19,7 @@ public class Vim : IPackage
         {
             case 0:
                 Utilities.BashStack.PushNextStage(stage + 1, Name);
-                this.InstallDependencies();
+                // this.InstallDependencies();
                 break;
             case 1:
                 Utilities.BashStack.PushBashCommand("apt install vim", true);
