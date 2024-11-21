@@ -54,7 +54,8 @@ public class Handler(IIntercommClient client)
         int statusCode = client.ConnectToServer(options.BaseStackPath, options.SlavePath);
         if (statusCode != 0)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Could not connect to daemon");
+            return 1;
         }
 
         Package packageToInstall = GetPackageToInstall();

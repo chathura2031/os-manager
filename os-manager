@@ -51,7 +51,11 @@ while [[ $? == 0 ]] ; do
     command=$(get_next_command)
 
     if [[ $last_command == $command ]]; then
-        echo "Something is wrong, recieved the same command twice. Exiting..."
+        if [[ $command == "" ]]; then
+            echo "Reached end of commands. Exiting..."
+        else
+            echo "Something is wrong, received the same command twice. Exiting..."
+        fi
         terminate $manager 1
     fi
 
