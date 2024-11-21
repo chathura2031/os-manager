@@ -24,7 +24,7 @@ public static class StackExtensions
     /// <param name="packageName">The name of the package to check for</param>
     public static void PushPackageExistsCommand(this FatStack stack, string packageName)
     {
-        string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --file {Utilities.ProgramStack.Path}";
+        string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --file {Utilities.ProgramStack.Path}.tmp";
         PushBashCommand(stack, command, false);
     }
 
@@ -39,7 +39,7 @@ public static class StackExtensions
     public static void PushNextStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
     {
         string content = adminAccess ? "sudo " : "";
-        content += $"./{Utilities.SlavePath} continue --slave {Utilities.SlavePath} --stage {stage} --package {packageName}";
+        content += $"./{Utilities.SlavePath} continue --stage {stage} --package {packageName}";
         
         if (dataPath != null)
         {

@@ -12,9 +12,10 @@ public static class StackExtensions
     /// <param name="useSudo">True if the command should use sudo, False otherwise</param>
     public static void PushBashCommand(this FatStack stack, string command, bool useSudo = false)
     {
-        string bashCommand = useSudo ? "sudo " : "";
-        bashCommand += $"{command} && ./{Utilities.SlavePath} popstack --stack {Utilities.BaseStackPath} --count 1";
-        stack.Push(bashCommand);
+        throw new NotImplementedException();
+        // string bashCommand = useSudo ? "sudo " : "";
+        // bashCommand += $"{command} && ./{Utilities.SlavePath} popstack --stack {Utilities.BaseStackPath} --count 1";
+        // stack.Push(bashCommand);
     }
 
     /// <summary>
@@ -24,8 +25,9 @@ public static class StackExtensions
     /// <param name="packageName">The name of the package to check for</param>
     public static void PushPackageExistsCommand(this FatStack stack, string packageName)
     {
-        string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --stack {Utilities.BaseStackPath})";
-        PushBashCommand(stack, command, false);
+        throw new NotImplementedException();
+        // string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --stack {Utilities.BaseStackPath})";
+        // PushBashCommand(stack, command, false);
     }
 
     /// <summary>
@@ -38,14 +40,15 @@ public static class StackExtensions
     /// <param name="adminAccess">True if the program needs admin access, False otherwise</param>
     public static void PushNextStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
     {
-        string content = adminAccess ? "sudo " : "";
-        content += $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --slave {Utilities.SlavePath} --stage {stage} --package {packageName}";
-        
-        if (dataPath != null)
-        {
-            content += $" --data {dataPath}";
-        }
-        
-        stack.Push(content);
+        throw new NotImplementedException();
+        // string content = adminAccess ? "sudo " : "";
+        // content += $"./{Utilities.SlavePath} continue --stack {Utilities.BaseStackPath} --stage {stage} --package {packageName}";
+        //
+        // if (dataPath != null)
+        // {
+        //     content += $" --data {dataPath}";
+        // }
+        //
+        // stack.Push(content);
     }
 }

@@ -26,8 +26,8 @@ public class UpdateAndUpgrade : IPackage
                 {
                     Utilities.RunInReverse([
                         () => Utilities.BashStack.PushBashCommand("apt update", true),
-                        () => Utilities.BashStack.PushBashCommand("apt upgrade", true),
-                        () => Utilities.BashStack.PushBashCommand("apt autoremove", true),
+                        () => Utilities.BashStack.PushBashCommand("apt upgrade -y", true),
+                        () => Utilities.BashStack.PushBashCommand("apt autoremove -y", true),
                         () => Utilities.BashStack.PushNextStage(stage + 1, Package.Name())
                     ]);
                 }
