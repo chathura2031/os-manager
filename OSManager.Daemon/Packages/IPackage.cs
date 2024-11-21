@@ -11,4 +11,6 @@ public interface IPackage
     List<IPackage> OptionalExtras { get; }
 
     public int Install(int stage, string data);
+
+    public int Configure(int stage);
 }

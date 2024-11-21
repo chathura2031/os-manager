@@ -61,4 +61,9 @@ public class PackageDependencies : IPackage
 
         return 0;
     }
+
+    public int Configure(int stage)
+    {
+        return 0;
+    }
 }

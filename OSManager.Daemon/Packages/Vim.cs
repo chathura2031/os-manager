@@ -32,4 +32,10 @@ public class Vim : IPackage
 
         return statusCode;
     }
+
+    public int Configure(int stage)
+    {
+        // TODO: Implement this from the Vim.cs file in OldStuff
+        throw new NotImplementedException();
+    }
 }

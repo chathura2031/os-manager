@@ -77,4 +77,9 @@ public class Discord : IPackage
 
         return statusCode;
     }
+
+    public int Configure(int stage)
+    {
+        return 0;
+    }
 }

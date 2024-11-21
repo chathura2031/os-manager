@@ -14,7 +14,7 @@ public class UpdateAndUpgrade : IPackage
     
     public List<IPackage> OptionalExtras { get; } = [];
     
-    private DateTime? LastRun;
+    private DateTime? _lastRun;
 
     public int Install(int stage, string data)
     {
@@ -22,7 +22,7 @@ public class UpdateAndUpgrade : IPackage
         switch (stage)
         {
             case 1:
-                if (LastRun == null || DateTime.Now - LastRun >= new TimeSpan(0, 5, 0))
+                if (_lastRun == null || DateTime.Now - _lastRun >= new TimeSpan(0, 5, 0))
                 {
                     Utilities.RunInReverse([
                         () => Utilities.BashStack.PushBashCommand("apt update", true),
@@ -33,11 +33,16 @@ public class UpdateAndUpgrade : IPackage
                 }
                 break;
             case 2:
-                LastRun = DateTime.Now;
+                _lastRun = DateTime.Now;
                 break;
             default:
                 throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of installation.");
         }
         return statusCode;
+    }
+
+    public int Configure(int stage)
+    {
+        return 0;
     }
 }
