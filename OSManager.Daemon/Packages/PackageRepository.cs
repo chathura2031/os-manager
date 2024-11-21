@@ -10,6 +10,7 @@ public static class PackageRepository
         PackageDependencies.Instance, 
         UpdateAndUpgrade.Instance,
         Discord.Instance,
+        Vim.Instance
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

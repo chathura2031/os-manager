@@ -13,5 +13,8 @@ public enum Package
     INTERNAL_UpdateAndUpgrade,
     
     [Name("discord"), PrettyName("Discord")]
-    Discord
+    Discord,
+    
+    [Name("vim"), PrettyName("Vim")]
+    Vim
 }
