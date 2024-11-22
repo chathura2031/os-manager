@@ -3,8 +3,8 @@ using CommandLine;
 namespace OSManager.CLI.CliOptions;
 
 // TODO
-[Verb("continue", HelpText = "TODO")]
-public class ContinueOptions
+[Verb("install", HelpText = "TODO")]
+public class InstallOptions
 {
     [Option('n', "stage", Required = true,
         HelpText = "the stage of installation to continue from")]

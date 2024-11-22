@@ -36,10 +36,10 @@ public static class StackExtensions
     /// <param name="packageName">The package's name</param>
     /// <param name="dataPath">The path to any data required (optional)</param>
     /// <param name="adminAccess">True if the program needs admin access, False otherwise</param>
-    public static void PushNextStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
+    public static void PushInstallStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
     {
         string content = adminAccess ? "sudo " : "";
-        content += $"./{Utilities.SlavePath} continue --stage {stage} --package {packageName}";
+        content += $"./{Utilities.SlavePath} install --stage {stage} --package {packageName}";
         
         if (dataPath != null)
         {

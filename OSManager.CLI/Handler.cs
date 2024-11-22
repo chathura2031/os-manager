@@ -62,7 +62,7 @@ public class Handler(IIntercommClient client)
         return client.Install(packageToInstall, 1);
     }
     
-    public int GotoStep(ContinueOptions options)
+    public int Install(InstallOptions options)
     {
         foreach (Package package in Enum.GetValues(typeof(Package)))
         {

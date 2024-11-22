@@ -20,7 +20,7 @@ public class Vim : IPackage
         switch (stage)
         {
             case 1:
-                Utilities.BashStack.PushNextStage(stage + 1, Package.Name());
+                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name());
                 this.InstallDependencies();
                 break;
             case 2:

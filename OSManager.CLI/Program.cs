@@ -9,10 +9,10 @@ IIntercommClient client = new ProtoClient("PipesOfPiece");
 Handler handler = new(client);
 
 // TODO: Figure out a way to avoid having the types in angle brackets and in the map result
-return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, ContinueOptions, PopStackOptions, PushStackOptions, FinaliseOptions>(args)
+return CommandLine.Parser.Default.ParseArguments<InitialiseOptions, InstallOptions, PopStackOptions, PushStackOptions, FinaliseOptions>(args)
     .MapResult(
         (InitialiseOptions opts) => handler.Initialise(opts),
-        (ContinueOptions opts) => handler.GotoStep(opts),
+        (InstallOptions opts) => handler.Install(opts),
         (PopStackOptions opts) => handler.PopStack(opts),
         (PushStackOptions opts) => handler.PushStack(opts),
         (FinaliseOptions opts) => handler.Finalise(opts),

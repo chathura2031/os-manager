@@ -46,7 +46,7 @@ public class Discord : IPackage
         switch (stage)
         {
             case 1:
-                Utilities.BashStack.PushNextStage(stage + 1, Package.Name());
+                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name());
                 this.InstallDependencies();
                 break;
             case 2:
@@ -60,7 +60,7 @@ public class Discord : IPackage
                 
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"apt install -y --fix-broken {filePath}", true),
-                    () => Utilities.BashStack.PushNextStage(stage + 1, Package.Name(), filePath),
+                    () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), filePath),
                 ]);
                 break;
             case 3:

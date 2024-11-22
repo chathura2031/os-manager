@@ -25,12 +25,12 @@ public class PackageDependencies : IPackage
         {
             case 1:
                 // Update sources and upgrade packages
-                Utilities.BashStack.PushNextStage(stage + 1, Package.Name(), dependencyName);
+                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dependencyName);
                 UpdateAndUpgrade.Instance.Install(1, "");
                 break;
             case 2:
                 // Check whether each dependency has been installed
-                Utilities.BashStack.PushNextStage(stage + 1, Package.Name(), dependencyName);
+                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dependencyName);
                 foreach (IPackage dependency in package.Dependencies)
                 {
                     Utilities.BashStack.PushPackageExistsCommand(dependency.Package.Name());
@@ -47,7 +47,7 @@ public class PackageDependencies : IPackage
                     if (packageName == "no")
                     {
                         
-                        Utilities.BashStack.PushNextStage(0, dependency.Package.Name());
+                        Utilities.BashStack.PushInstallStage(0, dependency.Package.Name());
                     }
                     else if (packageName != dependency.Package.Name())
                     {
