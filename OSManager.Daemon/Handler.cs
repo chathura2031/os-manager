@@ -12,6 +12,7 @@ public class Handler
     {
         server.OnInitialise += OnInitialise;
         server.OnInstall += OnInstall;
+        server.OnConfigure += OnConfigure;
         server.OnStackPop += OnStackPop;
         server.OnStackPush += OnStackPush;
         server.OnFinalise += OnFinalise;
@@ -27,6 +28,12 @@ public class Handler
     {
         IPackage package = PackageRepository.GetPackage(installEventArgs.Package);
         package.Install(installEventArgs.Stage, installEventArgs.Data ?? string.Empty);
+    }
+
+    void OnConfigure(object? sender, ConfigureEventArgs configureEventArgs)
+    {
+        IPackage package = PackageRepository.GetPackage(configureEventArgs.Package);
+        package.Configure(configureEventArgs.Stage);
     }
 
     void OnStackPop(object? sender, PopStackEventArgs popStackEventArgs)

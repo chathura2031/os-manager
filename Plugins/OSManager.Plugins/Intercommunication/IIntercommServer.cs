@@ -9,6 +9,7 @@ public interface IIntercommServer
     public event EventHandler<PushStackEventArgs> OnStackPush;
     public event EventHandler OnFinalise;
     public event EventHandler<InstallEventArgs> OnInstall;
+    public event EventHandler<ConfigureEventArgs> OnConfigure;
 
     public Task StartServer();
 }

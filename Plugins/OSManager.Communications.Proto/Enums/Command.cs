@@ -11,6 +11,9 @@ public enum Command
     [Type(typeof(InstallCommand))]
     InstallCommand,
     
+    [Type(typeof(ConfigureCommand))]
+    ConfigureCommand,
+    
     [Type(typeof(PopStackCommand))]
     PopStackCommand,
     

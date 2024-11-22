@@ -9,6 +9,8 @@ public interface IIntercommClient
 
     public int Install(Package package, int stage, string? data = null);
     
+    public int Configure(Package package, int stage);
+    
     public int PopStack(int count, StackType stack);
     
     public int PushStack(string[] content);

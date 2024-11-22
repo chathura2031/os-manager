@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Run the manager UI
+./OSManager.Daemon/bin/Debug/net8.0/OSManager.Daemon

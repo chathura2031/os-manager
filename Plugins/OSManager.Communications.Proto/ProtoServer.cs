@@ -16,6 +16,7 @@ public class ProtoServer : IIntercommServer
     public event EventHandler<PushStackEventArgs>? OnStackPush;
     public event EventHandler? OnFinalise;
     public event EventHandler<InstallEventArgs>? OnInstall;
+    public event EventHandler<ConfigureEventArgs>? OnConfigure;
 
     public bool IsConnected => _server.IsConnected;
 
@@ -111,6 +112,27 @@ public class ProtoServer : IIntercommServer
                 }
                 
                 if (installCommand.DisconnectAfter)
+                {
+                    DisconnectFromClient();
+                }
+            }
+            else if (data.GetType() == typeof(ConfigureCommand))
+            {
+                var configureCommand = (ConfigureCommand)data;
+
+                if (OnConfigure != null)
+                {
+                    ConfigureEventArgs e = new()
+                    {
+                        Package = configureCommand.Package,
+                        Stage = configureCommand.Stage
+                    };
+                    
+                    OnConfigure.Invoke(this, e);
+                    SendResponse(e.StatusCode);
+                }
+
+                if (configureCommand.DisconnectAfter)
                 {
                     DisconnectFromClient();
                 }

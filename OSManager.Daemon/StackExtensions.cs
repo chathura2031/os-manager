@@ -29,22 +29,33 @@ public static class StackExtensions
     }
 
     /// <summary>
-    /// Push a bash command to execute a specific stage of this project
+    /// Push a bash command to install a specific package
     /// </summary>
     /// <param name="stack">A reference to a stack</param>
     /// <param name="stage">The installation stage to run</param>
     /// <param name="packageName">The package's name</param>
     /// <param name="dataPath">The path to any data required (optional)</param>
-    /// <param name="adminAccess">True if the program needs admin access, False otherwise</param>
-    public static void PushInstallStage(this FatStack stack, int stage, string packageName, string? dataPath = null, bool adminAccess = false)
+    public static void PushInstallStage(this FatStack stack, int stage, string packageName, string? dataPath = null)
     {
-        string content = adminAccess ? "sudo " : "";
-        content += $"./{Utilities.SlavePath} install --stage {stage} --package {packageName}";
+        string content = $"./{Utilities.SlavePath} install --stage {stage} --package {packageName}";
         
         if (dataPath != null)
         {
             content += $" --data {dataPath}";
         }
+        
+        stack.Push(content);
+    }
+
+    /// <summary>
+    /// Push a bash command to configure a specific package
+    /// </summary>
+    /// <param name="stack">A reference to a stack</param>
+    /// <param name="stage">The configuration stage to run</param>
+    /// <param name="packageName">The package's name</param>
+    public static void PushConfigureStage(this FatStack stack, int stage, string packageName)
+    {
+        string content = $"./{Utilities.SlavePath} configure --stage {stage} --package {packageName}";
         
         stack.Push(content);
     }

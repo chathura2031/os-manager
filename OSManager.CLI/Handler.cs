@@ -9,7 +9,7 @@ namespace OSManager.CLI;
 
 public class Handler(IIntercommClient client)
 {
-    public Package GetPackageToInstall()
+    private Package GetPackage(string type)
     {
         List<Package> packages = new();
         // Get all non-internal packages
@@ -32,7 +32,7 @@ public class Handler(IIntercommClient client)
 
         while (true)
         {
-            Console.Write($"Please enter a value between 1 and {packages.Count} to select a package to install: ");
+            Console.Write($"Please enter a value between 1 and {packages.Count} to select a package to {type}: ");
             bool success = int.TryParse(Console.ReadLine(), out int selection);
 
             if (!success || selection < 1 || selection > packages.Count)
@@ -42,6 +42,41 @@ public class Handler(IIntercommClient client)
             }
 
             return packages[selection-1];
+        }
+    }
+    
+    private int ShowMenu()
+    {
+        Console.WriteLine("##################################################");
+        Console.WriteLine("1. Install a package");
+        Console.WriteLine("2. Configure a package");
+        
+        while (true)
+        {
+            Console.Write("Please enter a value between 1 and 2 to select an option: ");
+            bool success = int.TryParse(Console.ReadLine(), out int selection);
+            
+            if (!success || selection < 1 || selection > 2)
+            {
+                Console.WriteLine("Invalid selection. Try again.");
+                continue;
+            }
+
+            switch (selection)
+            {
+                case 1:
+                {
+                    Package packageToInstall = GetPackage("install");
+                    return client.Install(packageToInstall, 1);
+                }
+                case 2:
+                {
+                    Package packageToConfigure = GetPackage("configure");
+                    return client.Configure(packageToConfigure, 1);
+                }
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
     
@@ -58,8 +93,7 @@ public class Handler(IIntercommClient client)
             return 1;
         }
 
-        Package packageToInstall = GetPackageToInstall();
-        return client.Install(packageToInstall, 1);
+        return ShowMenu();
     }
     
     public int Install(InstallOptions options)
@@ -69,6 +103,19 @@ public class Handler(IIntercommClient client)
             if (options.Package == package.Name())
             {
                 return client.Install(package, options.Stage, options.DataPath);
+            }
+        }
+        
+        throw new NotImplementedException();
+    }
+
+    public int Configure(ConfigureOptions options)
+    {
+        foreach (Package package in Enum.GetValues(typeof(Package)))
+        {
+            if (options.Package == package.Name())
+            {
+                return client.Configure(package, options.Stage);
             }
         }
         
