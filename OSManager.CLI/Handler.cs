@@ -91,8 +91,7 @@ public class Handler(IIntercommClient client)
         AssemblyName assembly = Assembly.GetEntryAssembly()!.GetName();
         Console.WriteLine($"Version {assembly.Version}");
 
-        // TODO: Handle status code
-        int statusCode = client.ConnectToServer(options.BaseStackPath, options.SlavePath);
+        int statusCode = client.ConnectToServer(options.BaseStackPath, options.SlavePath, options.WorkingDirectory);
         if (statusCode != 0)
         {
             Console.WriteLine("Could not connect to daemon");

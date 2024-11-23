@@ -49,9 +49,13 @@ public class Vim : IPackage
         {
             case 1:
             {
-                string origin = Path.Join(Environment.CurrentDirectory, Package.Name(), ConfigFileName);
-                string destination = Path.Join(DestinationConfigDirPath, "vimrc");
-                Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}", true);
+                string origin = Path.Join(Utilities.WorkingDirectory, Package.Name(), ConfigFileName);
+                string destinationDir = DestinationConfigDirPath;
+                string destination = Path.Join(destinationDir, "vimrc");
+                Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}", true),
+                    () => Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}", true)
+                ]);
                 break;
             }
             default:
@@ -69,8 +73,12 @@ public class Vim : IPackage
             case 1:
             {
                 string origin = Path.Join(DestinationConfigDirPath, "vimrc");
-                string destination = Path.Join(Environment.CurrentDirectory, Package.Name(), ConfigFileName);
-                Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}");
+                string destinationDir = Path.Join(Utilities.WorkingDirectory, Package.Name());
+                string destination = Path.Join(destinationDir, ConfigFileName);
+                Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}"),
+                    () => Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}")
+                ]);
                 break;
             }
             default:

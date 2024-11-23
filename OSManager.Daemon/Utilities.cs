@@ -4,6 +4,8 @@ namespace OSManager.Daemon;
 
 public static class Utilities
 {
+    private static string? _workingDirectory;
+
     public static string BaseStackPath { get; private set; }
     
     // A stack that the master agent (the bash client) will read from
@@ -13,6 +15,12 @@ public static class Utilities
     public static ThinStack ProgramStack { get; private set; }
     
     public static string SlavePath { get; set; } = null!;
+    
+    public static string WorkingDirectory
+    {
+        get => _workingDirectory ?? Environment.CurrentDirectory;
+        set => _workingDirectory = value;
+    } 
     
     /// <summary>
     /// Prompt the user for a yes or no answer

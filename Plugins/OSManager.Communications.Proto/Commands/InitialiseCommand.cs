@@ -12,5 +12,8 @@ public class InitialiseCommand : ICommand
     public string BaseStackPath { get; set; }
     
     [ProtoMember(3)]
+    public string? WorkingDirectoryPath { get; set; }
+    
+    [ProtoMember(4)]
     public bool DisconnectAfter { get; set; }
 }

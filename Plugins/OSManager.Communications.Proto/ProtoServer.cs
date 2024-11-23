@@ -86,7 +86,8 @@ public class ProtoServer : IIntercommServer
                     InitialiseEventArgs e = new()
                     {
                         SlavePath = initialiseCommand.SlavePath,
-                        SessionId = initialiseCommand.BaseStackPath
+                        SessionId = initialiseCommand.BaseStackPath,
+                        WorkingDirectoryPath = initialiseCommand.WorkingDirectoryPath
                     };
                     OnInitialise.Invoke(this, e);
                 }

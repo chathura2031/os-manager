@@ -15,4 +15,8 @@ public class InitialiseOptions
     [Option('a', "slave", Required = true,
         HelpText = "the path to the slave agent")]
     public string SlavePath { get; set; }
+    
+    [Option('w', "workingdir", Required = false,
+        HelpText = "the path to the working directory")]
+    public string? WorkingDirectory { get; set; }
 }

@@ -48,7 +48,7 @@ public class ProtoClient : IIntercommClient
         return 0;
     }
 
-    public int ConnectToServer(string sessionId, string slavePath)
+    public int ConnectToServer(string sessionId, string slavePath, string? workingDirectory = null)
     {
         int statusCode = ConnectToServer();
         if (statusCode != 0)
@@ -60,6 +60,7 @@ public class ProtoClient : IIntercommClient
         {
             SlavePath = slavePath,
             BaseStackPath = sessionId,
+            WorkingDirectoryPath = workingDirectory,
             DisconnectAfter = false
         });
 

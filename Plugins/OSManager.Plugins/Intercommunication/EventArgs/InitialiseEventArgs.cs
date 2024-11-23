@@ -4,4 +4,5 @@ public class InitialiseEventArgs : EventArgs
 {
     public string SlavePath;
     public string SessionId;
+    public string? WorkingDirectoryPath;
 }

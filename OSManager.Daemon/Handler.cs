@@ -23,6 +23,10 @@ public class Handler
     {
         Utilities.SlavePath = initialiseEventArgs.SlavePath;
         Utilities.GetOrCreateStacks(initialiseEventArgs.SessionId, true);
+        if (initialiseEventArgs.WorkingDirectoryPath != null)
+        {
+            Utilities.WorkingDirectory = initialiseEventArgs.WorkingDirectoryPath;
+        }
     }
 
     void OnInstall(object? sender, InstallEventArgs installEventArgs)

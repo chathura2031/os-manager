@@ -5,7 +5,7 @@ namespace OSManager.Plugins.Intercommunication;
 
 public interface IIntercommClient
 {
-    public int ConnectToServer(string sessionId, string slavePath);
+    public int ConnectToServer(string sessionId, string slavePath, string? workingDirectory = null);
 
     public int Install(Package package, int stage, string? data = null);
     
