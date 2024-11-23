@@ -10,6 +10,7 @@ public interface IIntercommServer
     public event EventHandler OnFinalise;
     public event EventHandler<InstallEventArgs> OnInstall;
     public event EventHandler<ConfigureEventArgs> OnConfigure;
+    public event EventHandler<BackupConfigEventArgs> OnBackupConfig;
 
     public Task StartServer();
 }

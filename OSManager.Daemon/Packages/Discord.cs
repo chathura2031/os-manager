@@ -82,4 +82,9 @@ public class Discord : IPackage
     {
         return 0;
     }
+
+    public int BackupConfig(int stage)
+    {
+        return 0;
+    }
 }

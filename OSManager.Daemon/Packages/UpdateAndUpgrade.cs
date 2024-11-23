@@ -45,4 +45,9 @@ public class UpdateAndUpgrade : IPackage
     {
         return 0;
     }
+
+    public int BackupConfig(int stage)
+    {
+        return 0;
+    }
 }

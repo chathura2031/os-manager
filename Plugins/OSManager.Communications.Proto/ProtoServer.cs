@@ -17,6 +17,8 @@ public class ProtoServer : IIntercommServer
     public event EventHandler? OnFinalise;
     public event EventHandler<InstallEventArgs>? OnInstall;
     public event EventHandler<ConfigureEventArgs>? OnConfigure;
+    
+    public event EventHandler<BackupConfigEventArgs>? OnBackupConfig;
 
     public bool IsConnected => _server.IsConnected;
 
@@ -133,6 +135,27 @@ public class ProtoServer : IIntercommServer
                 }
 
                 if (configureCommand.DisconnectAfter)
+                {
+                    DisconnectFromClient();
+                }
+            }
+            else if (data.GetType() == typeof(BackupConfigCommand))
+            {
+                var backupConfigCommand = (BackupConfigCommand)data;
+
+                if (OnBackupConfig != null)
+                {
+                    BackupConfigEventArgs e = new()
+                    {
+                        Package = backupConfigCommand.Package,
+                        Stage = backupConfigCommand.Stage
+                    };
+                    
+                    OnBackupConfig.Invoke(this, e);
+                    SendResponse(e.StatusCode);
+                }
+
+                if (backupConfigCommand.DisconnectAfter)
                 {
                     DisconnectFromClient();
                 }

@@ -61,7 +61,7 @@ public class Vim : IPackage
         return statusCode;
     }
 
-    public int BackupConfiguration(int stage)
+    public int BackupConfig(int stage)
     {
         int statusCode = 0;
         switch (stage)

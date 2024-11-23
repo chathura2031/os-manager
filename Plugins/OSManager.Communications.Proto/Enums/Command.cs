@@ -14,6 +14,9 @@ public enum Command
     [Type(typeof(ConfigureCommand))]
     ConfigureCommand,
     
+    [Type(typeof(BackupConfigCommand))]
+    BackupConfigCommand,
+    
     [Type(typeof(PopStackCommand))]
     PopStackCommand,
     

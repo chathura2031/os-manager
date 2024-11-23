@@ -66,4 +66,9 @@ public class PackageDependencies : IPackage
     {
         return 0;
     }
+
+    public int BackupConfig(int stage)
+    {
+        return 0;
+    }
 }

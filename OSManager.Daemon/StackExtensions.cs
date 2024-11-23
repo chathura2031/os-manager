@@ -59,4 +59,17 @@ public static class StackExtensions
         
         stack.Push(content);
     }
+    
+    /// <summary>
+    /// Push a bash command to back the configuration of a specific package
+    /// </summary>
+    /// <param name="stack">A reference to a stack</param>
+    /// <param name="stage">The backup configuration stage to run</param>
+    /// <param name="packageName">The package's name</param>
+    public static void PushBackupConfigStage(this FatStack stack, int stage, string packageName)
+    {
+        string content = $"./{Utilities.SlavePath} backupconfig --stage {stage} --package {packageName}";
+        
+        stack.Push(content);
+    }
 }

@@ -11,6 +11,8 @@ public interface IIntercommClient
     
     public int Configure(Package package, int stage);
     
+    public int BackupConfig(Package package, int stage);
+    
     public int PopStack(int count, StackType stack);
     
     public int PushStack(string[] content);

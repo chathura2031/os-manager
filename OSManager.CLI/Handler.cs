@@ -50,13 +50,14 @@ public class Handler(IIntercommClient client)
         Console.WriteLine("##################################################");
         Console.WriteLine("1. Install a package");
         Console.WriteLine("2. Configure a package");
+        Console.WriteLine("3. Backup the configuration of a package");
         
         while (true)
         {
-            Console.Write("Please enter a value between 1 and 2 to select an option: ");
+            Console.Write("Please enter a value between 1 and 3 to select an option: ");
             bool success = int.TryParse(Console.ReadLine(), out int selection);
             
-            if (!success || selection < 1 || selection > 2)
+            if (!success || selection < 1 || selection > 3)
             {
                 Console.WriteLine("Invalid selection. Try again.");
                 continue;
@@ -73,6 +74,11 @@ public class Handler(IIntercommClient client)
                 {
                     Package packageToConfigure = GetPackage("configure");
                     return client.Configure(packageToConfigure, 1);
+                }
+                case 3:
+                {
+                    Package packageToBackupConfig = GetPackage("backup the configuration of");
+                    return client.BackupConfig(packageToBackupConfig, 1);
                 }
                 default:
                     throw new NotImplementedException();
@@ -116,6 +122,19 @@ public class Handler(IIntercommClient client)
             if (options.Package == package.Name())
             {
                 return client.Configure(package, options.Stage);
+            }
+        }
+        
+        throw new NotImplementedException();
+    }
+    
+    public int BackupConfig(BackupConfigOptions options)
+    {
+        foreach (Package package in Enum.GetValues(typeof(Package)))
+        {
+            if (options.Package == package.Name())
+            {
+                return client.BackupConfig(package, options.Stage);
             }
         }
         

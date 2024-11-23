@@ -178,6 +178,46 @@ public class ProtoClient : IIntercommClient
         });
     }
 
+    public int BackupConfig(Package package, int stage)
+    {
+        int statusCode = ConnectToServer();
+        if (statusCode != 0)
+        {
+            return statusCode;
+        }
+
+        switch (stage)
+        {
+            case 0:
+                throw new Exception("Stage 0 is not valid");
+            case > 1:
+            {
+                // Remove the bash command that triggered this stage
+                statusCode = SendCommandAndAwaitResponse(new PopStackCommand
+                {
+                    Count = 1,
+                    Stack = StackType.BashStack,
+                    DisconnectAfter = false
+                });
+        
+                if (statusCode != 0)
+                {
+                    return statusCode;
+                }
+
+                break;
+            }
+        }
+        
+        // Send the configure command
+        return SendCommandAndAwaitResponse(new BackupConfigCommand
+        {
+            Package = package,
+            Stage = stage,
+            DisconnectAfter = true
+        });
+    }
+
     public int PopStack(int count, StackType stack)
     {
         int statusCode = ConnectToServer();

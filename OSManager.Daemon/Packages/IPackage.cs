@@ -13,4 +13,6 @@ public interface IPackage
     public int Install(int stage, string data);
 
     public int Configure(int stage);
+    
+    public int BackupConfig(int stage);
 }
