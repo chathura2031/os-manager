@@ -21,40 +21,77 @@ public static class Communication
         }
     }
     
+    /// <summary>
+    /// Read the next object sent through the binary stream as a byte array
+    /// </summary>
+    /// <param name="binaryReader">The binary stream to read from</param>
+    /// <returns>A byte array of the next object</returns>
     public static byte[] GetData(BinaryReader binaryReader)
     {
-        List<byte> output = new();
+        // Allocate enough space for the metadata
+        byte metadataSize = sizeof(long) + 1;
+        List<byte> output = new(metadataSize);
         byte? val;
         
-        while ((val = binaryReader.ReadByte()) != 0)
+        // Read in the metadata
+        for (int i = 0; i < metadataSize; i++)
         {
-            output.Add((byte)val);
+            output.Add(binaryReader.ReadByte());
+        }
+
+        // Read in the object
+        long objSize = BitConverter.ToInt64(output.Take(metadataSize - 1).ToArray());
+        for (int i = 0; i < objSize; i++)
+        {
+            output.Add(binaryReader.ReadByte());
         }
 
         return output.ToArray();
     }
 
+    /// <summary>
+    /// Serialize a given object to bytes. Once serialized, the first 8 bytes (size of long) will denote the size of the
+    /// object, the byte after this will denote the type of the object and the last n bytes will be the object converted
+    /// to bytes
+    /// </summary>
+    /// <param name="obj">The object to serialize</param>
+    /// <typeparam name="T">The type of object to serialize</typeparam>
+    /// <returns>A byte array of serialized data</returns>
+    /// <exception cref="Exception">Thrown if the size of the first chunk is incorrect</exception>
     public static byte[] Serialize<T>(T obj)
     {
-        // TODO: Modify so that you send the number of bytes for the object followed by a 0 then the type identifier (single byte) followed by the data
         MemoryStream stream = new();
         Serializer.Serialize(stream, obj);
-
-        var data = new byte[stream.Length + 2];
-        data[0] = ToByteIdentifier(obj);
-        data[^1] = 0;
-
-        Array.Copy(stream.ToArray(), 0, data, 1, stream.Length);
-
+        byte[] objSize = BitConverter.GetBytes(stream.Length);
+        if (objSize.Length != sizeof(long))
+        {
+            throw new Exception("The number of bytes required to store the object size is different to the size of a long");
+        }
+        
+        var data = new byte[objSize.Length + 1 + stream.Length];
+        
+        // Copy the object size
+        Array.Copy(objSize, data, objSize.Length);
+        // Add the byte identifier
+        data[objSize.Length] = ToByteIdentifier(obj);
+        // Copy the object
+        Array.Copy(stream.ToArray(), 0, data, objSize.Length + 1, stream.Length);
+        
         return data;
     }
     
+    /// <summary>
+    /// Deserialize a given byte array by reversing the serialization encoding
+    /// </summary>
+    /// <param name="data">The byte array to deserialize</param>
+    /// <param name="type">The type of the returned object</param>
+    /// <returns>The deserialized object</returns>
     public static object Deserialize(byte[] data, out Type type)
     {
-        type = data[0].ToType();
-        byte[] objData = data[1..];
+        type = data[sizeof(long)].ToType();
+        byte[] objData = data[(sizeof(long) + 1)..];
         MemoryStream stream = new(objData);
-        
+
         return Serializer.Deserialize(type, stream);
     }
     
