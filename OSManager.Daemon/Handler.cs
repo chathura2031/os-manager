@@ -78,4 +78,9 @@ public class Handler
     {
         Utilities.DeleteStacks();
     }
+
+    void OnTerminate()
+    {
+        // TODO: Delete all files of the form /tmp/osman-*
+    }
 }

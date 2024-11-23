@@ -43,7 +43,7 @@ stack_path=$stack_base_path".bash"
 # Run the manager UI
 manager="OSManager.CLI/bin/Debug/net8.0/OSManager.CLI"
 # ./$manager initialise --stack $stack_base_path --slave $manager
-./$manager initialise --stack $stack_base_path --slave $manager --workingdir $HOME/Projects/package-configs
+./$manager initialise --stack $stack_base_path --slave $manager --workingdir $HOME/Projects
 
 # Run any subsequent commands
 is_stack_empty

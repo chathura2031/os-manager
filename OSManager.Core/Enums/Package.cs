@@ -2,6 +2,7 @@ using OSManager.Core.Attributes;
 
 namespace OSManager.Core.Enums;
 
+// TODO: Move this to the plugins folder
 public enum Package
 {
     // ReSharper disable once InconsistentNaming
@@ -16,5 +17,8 @@ public enum Package
     Discord,
     
     [Name("vim"), PrettyName("Vim")]
-    Vim
+    Vim,
+    
+    [Name("google-chrome"), PrettyName("Chrome")]
+    Chrome,
 }

@@ -73,7 +73,7 @@ public class Vim : IPackage
             case 1:
             {
                 string origin = Path.Join(DestinationConfigDirPath, "vimrc");
-                string destinationDir = Path.Join(Utilities.WorkingDirectory, Package.Name());
+                string destinationDir = Path.Join(Utilities.BackupDirectory, Package.Name());
                 string destination = Path.Join(destinationDir, ConfigFileName);
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}"),

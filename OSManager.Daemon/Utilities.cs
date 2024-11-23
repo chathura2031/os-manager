@@ -6,6 +6,20 @@ public static class Utilities
 {
     private static string? _workingDirectory;
 
+    private static string HomeDirectory { get; } = Environment.GetEnvironmentVariable("HOME") ?? throw new NotImplementedException();
+    
+    public static string ConfigDirectory { get; } = Path.Join(HomeDirectory, ".config");
+    
+    public static string WorkingDirectory
+    {
+        get => _workingDirectory ?? Environment.CurrentDirectory;
+        set => _workingDirectory = value;
+    } 
+    
+    public static string BackupDirectory => Path.Join(WorkingDirectory, "os-config");
+    
+    public static string EncryptedBackupDirectory => Path.Join(WorkingDirectory, "os-config-secrets");
+    
     public static string BaseStackPath { get; private set; }
     
     // A stack that the master agent (the bash client) will read from
@@ -15,12 +29,6 @@ public static class Utilities
     public static ThinStack ProgramStack { get; private set; }
     
     public static string SlavePath { get; set; } = null!;
-    
-    public static string WorkingDirectory
-    {
-        get => _workingDirectory ?? Environment.CurrentDirectory;
-        set => _workingDirectory = value;
-    } 
     
     /// <summary>
     /// Prompt the user for a yes or no answer
@@ -146,5 +154,94 @@ public static class Utilities
         File.Delete(Utilities.ProgramStack.Path);
 
         return statusCode;
+    }
+    
+    /// <summary>
+    /// Copy a file to a new location
+    /// </summary>
+    /// <param name="sourcePath">The path to the file to copy</param>
+    /// <param name="destinationPath">The path to the file at the destination</param>
+    /// <param name="replaceFile">True if the file should be replaced if it already exists, False otherwise</param>
+    /// <returns>A status code</returns>
+    public static int CopyFile(string sourcePath, string destinationPath, bool replaceFile = true)
+    {
+        if (!File.Exists(sourcePath))
+        {
+            Console.WriteLine($"{sourcePath} does not exist");
+            return 1;
+        }
+
+        if (File.Exists(destinationPath))
+        {
+            if (!replaceFile)
+            {
+                return 1;
+            }
+            
+            File.Delete(destinationPath);
+        }
+        
+        try
+        {
+            // Create the parent destination directory if it doesn't exist
+            string? parentDir = Path.GetDirectoryName(destinationPath)!;
+            Directory.CreateDirectory(parentDir);
+            // Copy the file
+            File.Copy(sourcePath, destinationPath);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            return 1;
+        }
+
+        return 0;
+    }
+    
+    /// <summary>
+    /// Copy a directory to a new location and if specified, subdirectories
+    /// </summary>
+    /// <param name="sourcePath">The path to the directory to copy</param>
+    /// <param name="destinationPath">The path to the directory at the destination</param>
+    /// <param name="replaceFiles">True if the files should be replaced if it already exists, False otherwise</param>
+    /// <returns>A status code</returns>
+    public static int CopyDirectory(string sourcePath, string destinationPath, bool replaceFiles = false)
+    {
+        // Get information about the source directory
+        var dir = new DirectoryInfo(sourcePath);
+
+        // Check if the source directory exists
+        if (!dir.Exists)
+        {
+            Console.WriteLine($"{sourcePath} does not exist");
+            return 1;
+        }
+
+        // Cache directories before we start copying
+        DirectoryInfo[] dirs = dir.GetDirectories();
+
+        // Create the destination directory
+        Directory.CreateDirectory(destinationPath);
+
+        // Get the files in the source directory and copy to the destination directory
+        foreach (FileInfo file in dir.GetFiles())
+        {
+            string targetFilePath = Path.Join(destinationPath, file.Name);
+            CopyFile(file.FullName, targetFilePath, replaceFiles);
+        }
+
+        // TODO: Implement this iteratively
+        // TODO: Test this
+        // If recursive and copying subdirectories, recursively call this method
+        foreach (DirectoryInfo subDir in dirs)
+        {
+            string newDestinationDir = Path.Join(destinationPath, subDir.Name);
+            if (!File.Exists(newDestinationDir) || replaceFiles)
+            {
+                CopyDirectory(subDir.FullName, newDestinationDir, replaceFiles);
+            }
+        }
+
+        return 0;
     }
 }
