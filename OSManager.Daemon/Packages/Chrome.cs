@@ -100,13 +100,58 @@ public class Chrome : IPackage
                 // Backup profile metadata
                 Utilities.CopyFile(Path.Join(origin, "Local State"), Path.Join(encryptedDestination, "Local State"));
                 
+                // Backup bookmark data
+                Utilities.CopyFile(Path.Join(profileOrigin, "Bookmarks"), Path.Join(encryptedProfileDestination, "Bookmarks"));
+                
+                // Backup history
+                Utilities.CopyFile(Path.Join(profileOrigin, "History"), Path.Join(encryptedProfileDestination, "History"));
+                
+                // Backup cookies
+                Utilities.CopyFile(Path.Join(profileOrigin, "Cookies"), Path.Join(encryptedProfileDestination, "Cookies"));
+                
                 // Backup extension data
                 Utilities.CopyFile(Path.Join(profileOrigin, "Preferences"), Path.Join(encryptedProfileDestination, "Preferences"));
-                Utilities.CopyFile(Path.Join(profileOrigin, "Bookmarks"), Path.Join(encryptedProfileDestination, "Bookmarks"));
                 Utilities.CopyDirectory(Path.Join(profileOrigin, "Extensions"), Path.Join(encryptedProfileDestination, "Extensions"));
                 Utilities.CopyDirectory(Path.Join(profileOrigin, "Local Extension Settings"), Path.Join(encryptedProfileDestination, "Local Extension Settings"));
                 Utilities.CopyDirectory(Path.Join(profileOrigin, "Managed Extension Settings"), Path.Join(encryptedProfileDestination, "Managed Extension Settings"));
 
+                /*
+                 * Files we don't need:
+                 * - [PROFILE_PATH]\Extension State\LOG
+                 * - [PROFILE_PATH]\Extension State -- unsure
+                 * - [PROFILE_PATH]\GCM Store\Encryption\LOG
+                 * - [PROFILE_PATH]\GPUCache
+                 * - [PROFILE_PATH]\Local Extension Settings\*\LOG
+                 * - [PROFILE_PATH]\Local Extension Settings\*\*.log
+                 * - [PROFILE_PATH]\Local Storage\leveldb\LOG
+                 * - [PROFILE_PATH]\Service Worker\Database\*.log
+                 * - [PROFILE_PATH]\Service Worker\Database\LOG
+                 * - [PROFILE_PATH]\Service Worker\ScriptCache
+                 * - [PROFILE_PATH]\Session Storage\*.log
+                 * - [PROFILE_PATH]\Session Storage\LOG
+                 * - [PROFILE_PATH]\Session Storage -- unsure
+                 * - [PROFILE_PATH]\parcel_tracking_db -- unsure
+                 * - [PROFILE_PATH]\Site Characteristics Database\LOG
+                 * - [PROFILE_PATH]\Site Characteristics Database -- unsure
+                 * - [PROFILE_PATH]\Sync Data\LevelDB\LOG
+                 * - [PROFILE_PATH]\shared_proto_db\*.log
+                 * - [PROFILE_PATH]\shared_proto_db\LOG
+                 * - [PROFILE_PATH]\shared_proto_db\metadata\*.log
+                 * - [PROFILE_PATH]\shared_proto_db\metadata\LOG
+                 * - GrShaderCache
+                 * - GraphiteDawnCache
+                 * - ShaderCache
+                 *
+                 * A new profile requires:
+                 * - [PROFILE]\*
+                 * - Local State
+                 *
+                 * An extension requires:
+                 * - [PROFILE]\Preferences
+                 * - [PROFILE]\Extensions\[EXTENSION_ID]
+                 * - [PROFILE]\Local Extension Settings\[EXTENSION_ID]
+                 * - [PROFILE]\Managed Extension Settings\[EXTENSION_ID] -- this might not be needed
+                 */
                 // TODO: Read in and store the important parts of the preferences file
                 // Functions.CopyDirectory(sourcePath, Path.Join(Functions.EncryptedBackupDirectory, "google-chrome"));
                 // JObject o1 = JObject.Parse(File.ReadAllText(Path.Join(sourcePath, "Local State")));
