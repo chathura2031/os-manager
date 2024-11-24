@@ -12,6 +12,8 @@ public static class PackageRepository
         Discord.Instance,
         Vim.Instance,
         Chrome.Instance, 
+        NetworkDrives.Instance, 
+        LocalNugetRepo.Instance, 
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

@@ -6,7 +6,7 @@ public static class Utilities
 {
     private static string? _workingDirectory;
 
-    private static string HomeDirectory { get; } = Environment.GetEnvironmentVariable("HOME") ?? throw new NotImplementedException();
+    public static string HomeDirectory { get; } = Environment.GetEnvironmentVariable("HOME") ?? throw new NotImplementedException();
     
     public static string ConfigDirectory { get; } = Path.Join(HomeDirectory, ".config");
     

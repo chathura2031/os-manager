@@ -21,4 +21,10 @@ public enum Package
     
     [Name("google-chrome"), PrettyName("Chrome")]
     Chrome,
+    
+    [Name("network-drives"), PrettyName("Network Drives")]
+    NetworkDrives,
+    
+    [Name("local-nuget-repo"), PrettyName("Local Nuget Repo")]
+    LocalNugetRepo,
 }
