@@ -28,7 +28,7 @@ public class NetworkDrives : IPackage
                 Utilities.RunInReverse([
                     // TODO: Uncomment this
                     // () => Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action DecryptAll"),
-                    () => Utilities.BashStack.PushBackupConfigStage(stage + 1, Package.Name())
+                    () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
                 ]);
                 break;
             }
@@ -38,12 +38,15 @@ public class NetworkDrives : IPackage
                 
                 // TODO: Test this
                 Utilities.CopyFile(Path.Join(encryptedOrigin, "smbcredentials"),
-                    Path.Join(Utilities.HomeDirectory, "smbcredentials"));
+                    Path.Join(Utilities.HomeDirectory, ".smbcredentials"));
                 
-                string fstabFile = "fstab";
-                HashSet<string> linesToAdd = [..File.ReadLines(Path.Join(encryptedOrigin, fstabFile))];
+                string fstabFilename = "fstab";
+                string fstabFilePath = Path.Join("/etc", fstabFilename);
+                string tmpFstabFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
+                
+                HashSet<string> linesToAdd = [..File.ReadLines(Path.Join(encryptedOrigin, fstabFilename))];
 
-                string[] content = File.ReadAllLines(Path.Join("/etc", fstabFile));
+                string[] content = File.ReadAllLines(fstabFilePath);
                 foreach (string line in content)
                 {
                     string trimmedLine = line.Trim();
@@ -54,12 +57,11 @@ public class NetworkDrives : IPackage
                 }
 
                 string[] newContent = [..content, ..linesToAdd.ToArray()];
-                string newFstabFile = Path.Join("tmp", $"osman-{Guid.NewGuid()}.tmp");
-                File.WriteAllLines(newFstabFile, newContent);
+                File.WriteAllLines(tmpFstabFilePath, newContent);
                 
                 Utilities.RunInReverse([
-                    // TODO: Add bash copy command after adding nuget package
-                    () => Utilities.BashStack.PushBackupConfigStage(stage + 1, Package.Name())
+                    () => Utilities.BashStack.PushBashCommand($"mv -v ${tmpFstabFilePath} {fstabFilePath}", true),
+                    () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
                 ]);
                 
                 break;
