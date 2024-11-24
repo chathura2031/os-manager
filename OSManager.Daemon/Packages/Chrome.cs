@@ -144,7 +144,13 @@ public class Chrome : IPackage
                  *
                  * A new profile requires:
                  * - [PROFILE]\*
-                 * - Local State
+                 * - Local State:
+                 *   - info_cache
+                 *     - [PROFILE]
+                 *   - last_active_profiles
+                 *   - metrics
+                 *   - profile_counts_reported
+                 *   - profiles_order
                  *
                  * An extension requires:
                  * - [PROFILE]\Preferences
