@@ -154,9 +154,14 @@ public class Chrome : IPackage
                  *
                  * An extension requires:
                  * - [PROFILE]\Preferences
+                 *   - extensions
+                 *     - settings
+                 *       - [EXTENSION_ID]
                  * - [PROFILE]\Extensions\[EXTENSION_ID]
                  * - [PROFILE]\Local Extension Settings\[EXTENSION_ID]
+                 * - [PROFILE]\DNR Extension Rules
                  * - [PROFILE]\Managed Extension Settings\[EXTENSION_ID] -- this might not be needed
+                 * - [PROFILE]\Extension State -- this might not be needed
                  */
                 // TODO: Read in and store the important parts of the preferences file
                 // Functions.CopyDirectory(sourcePath, Path.Join(Functions.EncryptedBackupDirectory, "google-chrome"));
