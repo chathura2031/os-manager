@@ -116,6 +116,7 @@ public class Chrome : IPackage
                 Utilities.CopyDirectory(Path.Join(profileOrigin, "Managed Extension Settings"), Path.Join(encryptedProfileDestination, "Managed Extension Settings"));
 
                 /*
+                 * TODO: Set [PROFILE_PATH]/History to read only to disable history
                  * Files we don't need:
                  * - [PROFILE_PATH]\Extension State\LOG
                  * - [PROFILE_PATH]\Extension State -- unsure
@@ -142,6 +143,10 @@ public class Chrome : IPackage
                  * - GraphiteDawnCache
                  * - ShaderCache
                  *
+                 * Profile preferences are stored in:
+                 * - Local State
+                 * - [PROFILE]\Preferences
+                 * 
                  * A new profile requires:
                  * - [PROFILE]\*
                  * - Local State:
@@ -155,6 +160,7 @@ public class Chrome : IPackage
                  * An extension requires:
                  * - [PROFILE]\Preferences
                  *   - extensions
+                 *     - pinned_extensions
                  *     - settings
                  *       - [EXTENSION_ID]
                  * - [PROFILE]\Extensions\[EXTENSION_ID]
