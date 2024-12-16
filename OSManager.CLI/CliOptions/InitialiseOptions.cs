@@ -1,7 +1,4 @@
-using System.ComponentModel.DataAnnotations;
 using CommandLine;
-using CommandLine.Text;
-using Newtonsoft.Json;
 
 namespace OSManager.CLI.CliOptions;
 

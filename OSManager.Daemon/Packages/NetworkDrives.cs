@@ -26,8 +26,7 @@ public class NetworkDrives : IPackage
             case 1:
             {
                 Utilities.RunInReverse([
-                    // TODO: Uncomment this
-                    // () => Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action DecryptAll"),
+                    () => Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action DecryptAll"),
                     () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
                 ]);
                 break;
@@ -68,8 +67,7 @@ public class NetworkDrives : IPackage
             }
             case 3:
             {
-                // TODO: Uncomment this
-                // Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action EncryptAll");
+                Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action EncryptAll");
                 break;
             }
             default:

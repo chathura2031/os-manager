@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using PersistentTools.Stack;
 
 namespace OSManager.Daemon;
@@ -199,20 +200,27 @@ public static class Utilities
 
         return 0;
     }
-    
+
     /// <summary>
     /// Copy a directory to a new location and if specified, subdirectories
     /// </summary>
     /// <param name="sourcePath">The path to the directory to copy</param>
     /// <param name="destinationPath">The path to the directory at the destination</param>
     /// <param name="replaceFiles">True if the files should be replaced if it already exists, False otherwise</param>
+    /// <param name="extExclusions">File extensions to not copy</param>
+    /// <param name="fileNameExclusions">File names to not copy (must include file extension)</param>
     /// <returns>A status code</returns>
-    public static int CopyDirectory(string sourcePath, string destinationPath, bool replaceFiles = false)
+    public static int CopyDirectory(string sourcePath, string destinationPath, bool replaceFiles = false,
+        HashSet<string>? extExclusions = null, HashSet<string>? fileNameExclusions = null)
     {
+        extExclusions ??= [];
+        fileNameExclusions ??= [];
+        
         // Get information about the source directory
         var dir = new DirectoryInfo(sourcePath);
 
-        // Check if the source directory exists
+        // Check if the source directory existetermine which extension folders to copy
+        // string[] extensions = es
         if (!dir.Exists)
         {
             Console.WriteLine($"{sourcePath} does not exist");
@@ -228,6 +236,11 @@ public static class Utilities
         // Get the files in the source directory and copy to the destination directory
         foreach (FileInfo file in dir.GetFiles())
         {
+            if (extExclusions.Contains(file.Extension) || fileNameExclusions.Contains(file.Name))
+            {
+                continue;
+            }
+            
             string targetFilePath = Path.Join(destinationPath, file.Name);
             CopyFile(file.FullName, targetFilePath, replaceFiles);
         }
@@ -240,10 +253,88 @@ public static class Utilities
             string newDestinationDir = Path.Join(destinationPath, subDir.Name);
             if (!File.Exists(newDestinationDir) || replaceFiles)
             {
-                CopyDirectory(subDir.FullName, newDestinationDir, replaceFiles);
+                CopyDirectory(subDir.FullName, newDestinationDir, replaceFiles, extExclusions, fileNameExclusions);
             }
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// Replace the value for a given key in the original with the updated value
+    /// </summary>
+    /// <param name="original">The original JSON to replace</param>
+    /// <param name="updated">The updated JSON to get values from</param>
+    /// <param name="key">The key to replace</param>
+    public static void UpdateJson(ref JsonObject original, JsonObject updated, string key)
+    {
+        if (!original.ContainsKey(key) && !updated.ContainsKey(key))
+        {
+            return;
+        }
+
+        original.Remove(key);
+        
+        if (original.ContainsKey(key) && !updated.ContainsKey(key))
+        {
+            return;
+        }
+
+        original[key] = updated[key]!.DeepClone();
+    }
+
+    /// <summary>
+    /// Replace the value for a given set of keys in the original with the updated value
+    /// </summary>
+    /// <param name="original">The original JSON to replace</param>
+    /// <param name="updated">The updated JSON to get values from</param>
+    /// <param name="keys">The keys to replace. These can be nested keys
+    ///     eg. to replace keys ["a", "b" -> ["c", "d"]], you can pass
+    ///     in ["a", new object[] {"b", new object[] {"c", "d"}}]</param>
+    /// <exception cref="NotImplementedException"></exception>
+    public static void UpdateJson(ref JsonObject original, JsonObject updated, object[] keys)
+    {
+        Stack<Tuple<JsonObject, JsonObject, object>> nodes = new();
+        foreach (object key in keys)
+        {
+            nodes.Push(new(original, updated, key));
+        }
+
+        while (nodes.Count > 0)
+        {
+            var (jsonA, jsonB, obj) = nodes.Pop();
+
+            if (obj is string s)
+            {
+                UpdateJson(ref jsonA, jsonB, s);
+            }
+            else if (obj is object[] o)
+            {
+                string key = (string)o[0];
+                foreach (object subObj in (object[])o[1])
+                {
+                    bool keyExistsInA = jsonA.TryGetPropertyValue(key, out var jsonAChildNode);
+                    bool keyExistsInB = jsonB.TryGetPropertyValue(key, out var jsonBChildNode);
+                    
+                    if (!keyExistsInB)
+                    {
+                        continue;
+                    }
+                    
+                    if (!keyExistsInA && keyExistsInB)
+                    {
+                        UpdateJson(ref jsonA, jsonB, key);
+                    }
+                    else
+                    {
+                        nodes.Push(new(jsonA[key]!.AsObject(), jsonB[key]!.AsObject(), subObj));
+                    }
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
