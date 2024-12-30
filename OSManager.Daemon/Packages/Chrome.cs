@@ -67,6 +67,30 @@ public class Chrome : IPackage
         {
             case 1:
             {
+                Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action DecryptAll"),
+                    () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
+                ]);
+                break;
+            }
+            case 2:
+            {
+                string encryptedDestination = Path.Join(Utilities.EncryptedBackupDirectory, Package.Name());
+                string configDestination = Path.Join(Utilities.ConfigDirectory, Package.Name());
+
+                if (Directory.Exists(configDestination))
+                {
+                    Directory.Delete(configDestination, true);
+                }
+
+                Utilities.CopyDirectory(encryptedDestination, configDestination);
+
+                Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name());
+                break;
+            }
+            case 3:
+            {
+                Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action EncryptAll");
                 break;
             }
             default:
