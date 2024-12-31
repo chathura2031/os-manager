@@ -35,31 +35,53 @@ public class NetworkDrives : IPackage
             {
                 string encryptedOrigin = Path.Join(Utilities.EncryptedBackupDirectory, Package.Name());
                 
-                // TODO: Test this
-                Utilities.CopyFile(Path.Join(encryptedOrigin, "smbcredentials"),
-                    Path.Join(Utilities.HomeDirectory, ".smbcredentials"));
+                Utilities.CopyFile(Path.Join(encryptedOrigin, "smbcredentials"), Path.Join(Utilities.HomeDirectory, ".smbcredentials"));
                 
                 string fstabFilename = "fstab";
                 string fstabFilePath = Path.Join("/etc", fstabFilename);
                 string tmpFstabFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
-                
-                HashSet<string> linesToAdd = [..File.ReadLines(Path.Join(encryptedOrigin, fstabFilename))];
 
-                string[] content = File.ReadAllLines(fstabFilePath);
-                foreach (string line in content)
+                IEnumerable<string> linesToAdd = File.ReadLines(Path.Join(encryptedOrigin, fstabFilename));
+
+                // Create a temporary file with the contents of the fstab file but adding in (or replacing) the custom entries
+                using (StreamReader reader = new StreamReader(fstabFilePath))
+                using (StreamWriter writer = new StreamWriter(tmpFstabFilePath))
                 {
-                    string trimmedLine = line.Trim();
-                    if (linesToAdd.Contains(trimmedLine))
+                    bool startReplacement = false;
+                    string? lastLine = null;
+                    while (!reader.EndOfStream)
                     {
-                        linesToAdd.Remove(trimmedLine);
+                        string line = reader.ReadLine()!;
+                        if (!startReplacement && line == "# Start custom entries")
+                        {
+                            startReplacement = true;
+                        }
+
+                        if (!startReplacement)
+                        {
+                            writer.WriteLine(line);
+                        }
+                        else if (startReplacement && line == "# End custom entries")
+                        {
+                            foreach (string lineToAdd in linesToAdd)
+                            {
+                                writer.WriteLine(lineToAdd);
+                            }
+
+                            startReplacement = false;
+                        }
+
+                        lastLine = line;
+                    }
+
+                    if (lastLine == null || lastLine.Trim() != "")
+                    {
+                        writer.WriteLine();
                     }
                 }
 
-                string[] newContent = [..content, ..linesToAdd.ToArray()];
-                File.WriteAllLines(tmpFstabFilePath, newContent);
-                
                 Utilities.RunInReverse([
-                    () => Utilities.BashStack.PushBashCommand($"mv -v ${tmpFstabFilePath} {fstabFilePath}", true),
+                    () => Utilities.BashStack.PushBashCommand($"mv -v {tmpFstabFilePath} {fstabFilePath}", true),
                     () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
                 ]);
                 
@@ -84,6 +106,63 @@ public class NetworkDrives : IPackage
         {
             case 1:
             {
+                Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action DecryptAll"),
+                    () => Utilities.BashStack.PushBackupConfigStage(stage + 1, Package.Name())
+                ]);
+                break;
+            }
+            case 2:
+            {
+                string encryptedOrigin = Path.Join(Utilities.EncryptedBackupDirectory, Package.Name());
+                
+                Utilities.CopyFile(Path.Join(Utilities.HomeDirectory, ".smbcredentials"), Path.Join(encryptedOrigin, "smbcredentials"));
+                
+                string fstabFilename = "fstab";
+                string fstabFilePath = Path.Join("/etc", fstabFilename);
+                string tmpFstabFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
+                
+                // Create a new temporary file with just the custom fstab entries
+                using (StreamReader reader = new StreamReader(fstabFilePath))
+                using (StreamWriter writer = new StreamWriter(tmpFstabFilePath))
+                {
+                    bool startWrite = false;
+                    string? lastLine = null;
+                    while (!reader.EndOfStream)
+                    {
+                        string line = reader.ReadLine()!;
+                        if (!startWrite && line == "# Start custom entries")
+                        {
+                            startWrite = true;
+                        }
+
+                        if (startWrite)
+                        {
+                            writer.WriteLine(line);
+                        }
+
+                        if (startWrite && line == "# End custom entries")
+                        {
+                            startWrite = false;
+                        }
+
+                        lastLine = line;
+                    }
+
+                    if (lastLine == null || lastLine.Trim() != "")
+                    {
+                        writer.WriteLine();
+                    }
+                }
+
+                File.Move(tmpFstabFilePath, Path.Join(encryptedOrigin, fstabFilename), true);
+                
+                Utilities.BashStack.PushBackupConfigStage(stage + 1, Package.Name());
+                break;
+            }
+            case 3:
+            {
+                Utilities.BashStack.PushBashCommand($"{Utilities.EncryptorPath} -f true --workingdir {Utilities.EncryptedBackupDirectory} --action EncryptAll");
                 break;
             }
             default:
