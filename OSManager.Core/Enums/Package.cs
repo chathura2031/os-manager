@@ -27,4 +27,7 @@ public enum Package
     
     [Name("local-nuget-repo"), PrettyName("Local Nuget Repo")]
     LocalNugetRepo,
+    
+    [Name("yakuake"), PrettyName("Yakuake")]
+    Yakuake
 }

@@ -14,6 +14,7 @@ public static class PackageRepository
         Chrome.Instance, 
         NetworkDrives.Instance, 
         LocalNugetRepo.Instance, 
+        Yakuake.Instance,
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();
