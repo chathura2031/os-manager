@@ -43,11 +43,61 @@ public class NetworkDrives : IPackage
 
                 IEnumerable<string> linesToAdd = File.ReadLines(Path.Join(encryptedOrigin, fstabFilename));
 
+                // Get mount points from the fstab file
+                List<string> mountPoints = [];
+                foreach (string rawLine in linesToAdd)
+                {
+                    string line = rawLine.Trim();
+                    if (line[0] == '#')
+                    {
+                        continue;
+                    }
+
+                    // Read until the first space (the end of the first parameter)
+                    int i = 0;
+                    while (line[i] != ' ')
+                    {
+                        i++;
+                    }
+
+                    // Read until the end of the spaces (the start of the second parameter)
+                    while (line[i] == ' ')
+                    {
+                        i++;
+                    }
+
+                    // Read until the end of the second parameter
+                    int startIdx = i;
+                    while (line[i] != ' ')
+                    {
+                        i++;
+                    }
+                    int endIdx = i;
+                    
+                    string mountPoint = line.Substring(startIdx, endIdx-startIdx);
+                    mountPoints.Add(mountPoint);
+                }
+
+                void AddCustomFstabEntries(StreamWriter writer, bool addSpaceAbove)
+                {
+                    if (addSpaceAbove)
+                    {
+                        writer.WriteLine();
+                    }
+                    
+                    foreach (string lineToAdd in linesToAdd)
+                    {
+                        writer.WriteLine(lineToAdd);
+                    }
+                }
+
                 // Create a temporary file with the contents of the fstab file but adding in (or replacing) the custom entries
                 using (StreamReader reader = new StreamReader(fstabFilePath))
                 using (StreamWriter writer = new StreamWriter(tmpFstabFilePath))
                 {
+                    bool fstabEntryAdded = false;
                     bool startReplacement = false;
+                    bool addSpaceAbove = false;
                     string? lastLine = null;
                     while (!reader.EndOfStream)
                     {
@@ -55,6 +105,10 @@ public class NetworkDrives : IPackage
                         if (!startReplacement && line == "# Start custom entries")
                         {
                             startReplacement = true;
+                            if (lastLine.Trim() != "")
+                            {
+                                addSpaceAbove = true;
+                            }
                         }
 
                         if (!startReplacement)
@@ -63,24 +117,29 @@ public class NetworkDrives : IPackage
                         }
                         else if (startReplacement && line == "# End custom entries")
                         {
-                            foreach (string lineToAdd in linesToAdd)
-                            {
-                                writer.WriteLine(lineToAdd);
-                            }
-
+                            AddCustomFstabEntries(writer, addSpaceAbove);
+                            fstabEntryAdded = true;
                             startReplacement = false;
                         }
 
                         lastLine = line;
                     }
 
-                    if (lastLine == null || lastLine.Trim() != "")
+                    // If the custom entries comments do not exist, add the fstab entries to the end of the file
+                    if (!fstabEntryAdded)
+                    {
+                        AddCustomFstabEntries(writer, lastLine != null && lastLine.Trim() != "");
+                        writer.WriteLine();
+                    }
+                    // Ensure the file ends with a blank line
+                    else if (lastLine == null || lastLine.Trim() != "")
                     {
                         writer.WriteLine();
                     }
                 }
 
                 Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand("mkdir -p " + string.Join(' ', mountPoints), true),
                     () => Utilities.BashStack.PushBashCommand($"mv -v {tmpFstabFilePath} {fstabFilePath}", true),
                     () => Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name())
                 ]);
