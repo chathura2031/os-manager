@@ -81,6 +81,7 @@ public class Yakuake : IPackage
                 
                 Directory.CreateDirectory(backupDir);
                 File.Copy(originFilePath, destinationFilePath, true);
+                File.Copy("/usr/local/bin/open-yakuake-here", Path.Join(backupDir, "open-yakuake-here"), true);
                 
                 break;
             }
