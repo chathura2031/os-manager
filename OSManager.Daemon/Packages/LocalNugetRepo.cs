@@ -17,7 +17,20 @@ public class LocalNugetRepo : IPackage
     
     public int Install(int stage, string data)
     {
-        return 0;
+        int statusCode = 0;
+        switch (stage)
+        {
+            case 1:
+            {
+                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name());
+                this.InstallDependencies();
+                break;
+            }
+            default:
+                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} installation.");
+        }
+        
+        return statusCode;
     }
 
     public int Configure(int stage)
@@ -26,12 +39,6 @@ public class LocalNugetRepo : IPackage
         switch (stage)
         {
             case 1:
-            {
-                Utilities.BashStack.PushConfigureStage(stage + 1, Package.Name());
-                this.InstallDependencies();
-                break;
-            }
-            case 2:
             {
                 string nugetPath = Path.Join(Utilities.HomeDirectory, ".nuget");
                 string localNugetPath = Path.Join(nugetPath, "local-packages");
@@ -105,7 +112,13 @@ public class LocalNugetRepo : IPackage
 
     public int BackupConfig(int stage)
     {
-        // TODO
-        return 0;
+        int statusCode = 0;
+        switch (stage)
+        {
+            default:
+                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of configuration backup.");
+        }
+        
+        return statusCode;
     }
 }
