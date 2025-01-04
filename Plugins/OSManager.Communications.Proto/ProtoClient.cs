@@ -245,7 +245,8 @@ public class ProtoClient : IIntercommClient
 
         return SendCommandAndAwaitResponse(new PushStackCommand()
         {
-            Content = content
+            Content = content,
+            DisconnectAfter = true
         });
     }
 

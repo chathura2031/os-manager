@@ -24,7 +24,7 @@ public static class StackExtensions
     /// <param name="packageName">The name of the package to check for</param>
     public static void PushPackageExistsCommand(this FatStack stack, string packageName)
     {
-        string command = $"(dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --file {Utilities.ProgramStack.Path}.tmp";
+        string command = $"dpkg -l {packageName} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --file {Utilities.ProgramStack.Path}.tmp";
         PushBashCommand(stack, command, false);
     }
 

@@ -158,6 +158,7 @@ public class Handler(IIntercommClient client)
         if (options.FilePath != null)
         {
             content = File.ReadAllLines(options.FilePath);
+            File.Delete(options.FilePath);
         }
         else if (options.Content != null)
         {
