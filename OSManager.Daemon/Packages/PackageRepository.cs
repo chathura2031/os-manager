@@ -15,6 +15,7 @@ public static class PackageRepository
         NetworkDrives.Instance, 
         LocalNugetRepo.Instance, 
         Yakuake.Instance,
+        Qdbus.Instance
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

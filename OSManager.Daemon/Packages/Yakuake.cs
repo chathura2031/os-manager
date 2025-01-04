@@ -10,7 +10,7 @@ public class Yakuake : IPackage
 
     public Package Package { get; } = Package.Yakuake;
 
-    public List<IPackage> Dependencies { get; } = [];
+    public List<IPackage> Dependencies { get; } = [Qdbus.Instance];
 
     public List<IPackage> OptionalExtras { get; } = [];
     
@@ -47,13 +47,18 @@ public class Yakuake : IPackage
         {
             case 1:
             {
-                string originFilePath = Path.Join(Utilities.BackupDirectory, Package.Name(), ConfigFileName);
+                string backupDir = Path.Join(Utilities.BackupDirectory, Package.Name());
+                string originFilePath = Path.Join(backupDir, ConfigFileName);
                 string destinationDir = Path.Join(Utilities.HomeDirectory, ".config");
                 string destinationFilePath = Path.Join(destinationDir, ConfigFileName);
                 
                 Directory.CreateDirectory(destinationDir);
                 File.Copy(originFilePath, destinationFilePath, true);
                 
+                Utilities.RunInReverse([
+                    () => Utilities.BashStack.PushBashCommand($"cp -v {Path.Join(backupDir, "open-yakuake-here")} /usr/local/bin", true),
+                    () => Utilities.BashStack.PushBashCommand("gsettings set org.cinnamon.desktop.default-applications.terminal exec 'open-yakuake-here'")
+                ]);
                 break;
             }
             default:
@@ -71,10 +76,10 @@ public class Yakuake : IPackage
             case 1:
             {
                 string originFilePath = Path.Join(Utilities.HomeDirectory, ".config", ConfigFileName);
-                string destinationDir = Path.Join(Utilities.BackupDirectory, Package.Name());
-                string destinationFilePath = Path.Join(destinationDir, ConfigFileName);
+                string backupDir = Path.Join(Utilities.BackupDirectory, Package.Name());
+                string destinationFilePath = Path.Join(backupDir, ConfigFileName);
                 
-                Directory.CreateDirectory(destinationDir);
+                Directory.CreateDirectory(backupDir);
                 File.Copy(originFilePath, destinationFilePath, true);
                 
                 break;

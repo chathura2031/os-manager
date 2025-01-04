@@ -29,5 +29,8 @@ public enum Package
     LocalNugetRepo,
     
     [Name("yakuake"), PrettyName("Yakuake")]
-    Yakuake
+    Yakuake,
+    
+    [Name("qdbus"), PrettyName("QDBus")]
+    Qdbus
 }
