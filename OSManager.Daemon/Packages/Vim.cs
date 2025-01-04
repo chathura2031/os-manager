@@ -49,13 +49,23 @@ public class Vim : IPackage
         {
             case 1:
             {
-                // TODO: Double check this
-                string origin = Path.Join(Utilities.WorkingDirectory, Package.Name(), ConfigFileName);
+                string templatePath = Path.Join(Utilities.BackupDirectory, Package.Name(), ConfigFileName);
                 string destinationDir = DestinationConfigDirPath;
-                string destination = Path.Join(destinationDir, "vimrc");
+                string destinationFilePath = Path.Join(destinationDir, "vimrc");
+                
+                IEnumerable<string> linesToAdd = File.ReadLines(templatePath);
+                
+                Utilities.ReplaceContentBlockInFile(
+                    destinationFilePath ,
+                    out string modifiedFilePath,
+                    linesToAdd,
+                    "\" Start custom vim entries",
+                    "\" End custom vim entries"
+                );
+                
                 Utilities.RunInReverse([
                     () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}", true),
-                    () => Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}", true)
+                    () => Utilities.BashStack.PushBashCommand($"mv -v {modifiedFilePath} {destinationFilePath }", true)
                 ]);
                 break;
             }
@@ -68,11 +78,14 @@ public class Vim : IPackage
 
     public int BackupConfig(int stage)
     {
+        throw new NotImplementedException();
+        
         int statusCode = 0;
         switch (stage)
         {
             case 1:
             {
+                // TODO: Update to read in only the part inside the custom entries -- reverse of the config function
                 string origin = Path.Join(DestinationConfigDirPath, "vimrc");
                 string destinationDir = Path.Join(Utilities.BackupDirectory, Package.Name());
                 string destination = Path.Join(destinationDir, ConfigFileName);

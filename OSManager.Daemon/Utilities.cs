@@ -337,4 +337,98 @@ public static class Utilities
             }
         }
     }
+
+    /// <summary>
+    /// Replace the content between 2 block start and end comments with new lines as specified and generate a new file.
+    /// If the content doesn't exist, it will be added to the end of the file.
+    /// </summary>
+    /// <param name="filePath">The path to the file with the content to replace</param>
+    /// <param name="modifiedFilePath">The path to the new file with the content replaced</param>
+    /// <param name="linesToAdd">The lines to add. The first and last line must match the block start and end comments</param>
+    /// <param name="blockStartComment">The comment line which indicates the start of the block</param>
+    /// <param name="blockEndComment">The comment line which indicates the end of the block</param>
+    /// <exception cref="Exception">Thrown if the lines to add are invalid</exception>
+    public static void ReplaceContentBlockInFile(string filePath, out string modifiedFilePath,
+        IEnumerable<string> linesToAdd, string blockStartComment, string blockEndComment)
+    {
+        if (linesToAdd.Count() < 2)
+        {
+            throw new Exception("There must be at least 2 lines of content to add -- lines of comments indicating the start and end of the block");
+        }
+        
+        string blockFirstLine = linesToAdd.First().Trim();
+        string blockLastLine = linesToAdd.Last().Trim();
+        if (blockFirstLine.ToLower() != blockStartComment.ToLower())
+        {
+            throw new Exception($"The first line must be '{blockStartComment}' (case insensitive)");
+        }
+        else if (blockLastLine.ToLower() != blockEndComment.ToLower())
+        {
+            throw new Exception($"The last line must be '{blockEndComment}' (case insensitive)");
+        }
+
+        void AddCustomEntries(StreamWriter writer, bool addSpaceAbove)
+        {
+            if (addSpaceAbove)
+            {
+                writer.WriteLine();
+            }
+            
+            foreach (string lineToAdd in linesToAdd)
+            {
+                writer.WriteLine(lineToAdd);
+            }
+        }
+
+        modifiedFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
+        // Create a temporary file with the contents of the fstab file but adding in (or replacing) the custom entries
+        using (StreamReader reader = new StreamReader(filePath))
+        using (StreamWriter writer = new StreamWriter(modifiedFilePath))
+        {
+            bool customEntriesAdded = false;
+            bool startReplacement = false;
+            bool addSpaceAbove = false;
+            string? lastLine = null;
+            
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine()!;
+                if (!startReplacement && line.Trim().ToLower() == blockStartComment.ToLower())
+                {
+                    startReplacement = true;
+                    // Trigger a new line before the replacement content
+                    if (lastLine.Trim() != "")
+                    {
+                        addSpaceAbove = true;
+                    }
+                }
+
+                if (!startReplacement)
+                {
+                    writer.WriteLine(line);
+                }
+                else if (startReplacement && line.Trim().ToLower() == blockEndComment.ToLower())
+                {
+                    AddCustomEntries(writer, addSpaceAbove);
+                    customEntriesAdded = true;
+                    startReplacement = false;
+                    addSpaceAbove = false;
+                }
+
+                lastLine = line;
+            }
+
+            // If the custom entries comments do not exist, add the fstab entries to the end of the file
+            if (!customEntriesAdded)
+            {
+                AddCustomEntries(writer, lastLine != null && lastLine.Trim() != "");
+                writer.WriteLine();
+            }
+            // Ensure the file ends with a blank line
+            else if (lastLine == null || lastLine.Trim() != "")
+            {
+                writer.WriteLine();
+            }
+        }
+    }
 }
