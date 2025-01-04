@@ -32,7 +32,7 @@ public class Vim : IPackage
             }
             case 2:
             {
-                Utilities.BashStack.PushBashCommand("apt install vim", true);
+                Utilities.BashStack.PushBashCommand("apt install -y vim", true);
                 break;
             }
             default:
