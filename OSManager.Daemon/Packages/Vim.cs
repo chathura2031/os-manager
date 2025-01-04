@@ -49,6 +49,7 @@ public class Vim : IPackage
         {
             case 1:
             {
+                // TODO: Double check this
                 string origin = Path.Join(Utilities.WorkingDirectory, Package.Name(), ConfigFileName);
                 string destinationDir = DestinationConfigDirPath;
                 string destination = Path.Join(destinationDir, "vimrc");
