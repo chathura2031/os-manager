@@ -3,5 +3,5 @@
 sudo apt purge -y aspnetcore-runtime-8.0
 
 echo ""
-echo "Please add the following line to your ~/.profile file then reopen your terminal window"
+echo "Please add the following line to your ~/.bashrc file then reopen your terminal window"
 echo "PATH=\"\$HOME/.dotnet:\$PATH\""
