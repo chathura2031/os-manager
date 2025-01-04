@@ -26,6 +26,10 @@ public class LocalNugetRepo : IPackage
                 this.InstallDependencies();
                 break;
             }
+            case 2:
+            {
+                break;
+            }
             default:
                 throw new ArgumentException($"{Package.PrettyName()} does not have {stage} installation.");
         }
