@@ -40,20 +40,25 @@ public class PackageDependencies : IPackage
                 // Install each dependency that has not been installed
                 foreach (IPackage dependency in package.Dependencies)
                 {
-                    throw new NotImplementedException();
-                    string output = Utilities.ProgramStack.Pop().Trim().Split("\n")[^1];
+                    string? dependencyStatus = Utilities.ProgramStack.Pop();
+                    if (dependencyStatus == null)
+                    {
+                        throw new Exception("Could not find an output in the program stack but one was expected.");
+                    }
+                    
+                    string output = dependencyStatus.Trim().Split("\n")[^1];
                     string packageName = Regex.Split(output, @"\s+")[1];
 
-                    if (packageName == "no")
+                    if (output.Substring(0, 39) == "dpkg-query: no packages found matching ")
                     {
-                        
-                        Utilities.BashStack.PushInstallStage(0, dependency.Package.Name());
+                        Utilities.BashStack.PushInstallStage(1, dependency.Package.Name());
                     }
                     else if (packageName != dependency.Package.Name())
                     {
                         throw new ArgumentException($"Received installation status for {packageName} but expected {dependency.Package.Name()}");
                     }
                 }
+                
                 break;
             default:
                 throw new ArgumentException($"Dependency installer does not have {stage} stages of installation.");

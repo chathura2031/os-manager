@@ -107,7 +107,7 @@ public class Handler(IIntercommClient client)
         {
             if (options.Package == package.Name())
             {
-                return client.Install(package, options.Stage, options.DataPath);
+                return client.Install(package, options.Stage, options.DataPath, options.Stage == 1);
             }
         }
         

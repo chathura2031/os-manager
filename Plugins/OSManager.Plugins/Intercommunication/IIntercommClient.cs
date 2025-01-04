@@ -7,7 +7,7 @@ public interface IIntercommClient
 {
     public int ConnectToServer(string sessionId, string slavePath, string? workingDirectory = null);
 
-    public int Install(Package package, int stage, string? data = null);
+    public int Install(Package package, int stage, string? data = null, bool popBeforeExecution = false);
     
     public int Configure(Package package, int stage);
     

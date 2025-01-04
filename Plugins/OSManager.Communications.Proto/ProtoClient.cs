@@ -98,34 +98,31 @@ public class ProtoClient : IIntercommClient
     }
 
     // TODO: Implement function to simplify handling the status codes
-    public int Install(Package package, int stage, string? data = null)
+    public int Install(Package package, int stage, string? data = null, bool popBeforeExecution = false)
     {
         int statusCode = ConnectToServer();
         if (statusCode != 0)
         {
             return statusCode;
         }
-            
-        switch (stage)
-        {
-            case 0:
-                throw new Exception("Stage 0 is not valid");
-            case > 1:
-            {
-                // Remove the bash command that triggered this stage
-                statusCode = SendCommandAndAwaitResponse(new PopStackCommand
-                {
-                    Count = 1,
-                    Stack = StackType.BashStack,
-                    DisconnectAfter = false
-                });
-            
-                if (statusCode != 0)
-                {
-                    return statusCode;
-                }
 
-                break;
+        if (stage == 0)
+        {
+            throw new Exception("Stage 0 is not valid");
+        }
+        // Remove the bash command that triggered this stage
+        else if (popBeforeExecution || stage > 1)
+        {
+            statusCode = SendCommandAndAwaitResponse(new PopStackCommand
+            {
+                Count = 1,
+                Stack = StackType.BashStack,
+                DisconnectAfter = false
+            });
+        
+            if (statusCode != 0)
+            {
+                return statusCode;
             }
         }
 
