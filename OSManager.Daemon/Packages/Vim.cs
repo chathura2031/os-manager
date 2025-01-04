@@ -56,7 +56,7 @@ public class Vim : IPackage
                 IEnumerable<string> linesToAdd = File.ReadLines(templatePath);
                 
                 Utilities.ReplaceContentBlockInFile(
-                    destinationFilePath ,
+                    destinationFilePath,
                     out string modifiedFilePath,
                     linesToAdd,
                     "\" Start custom vim entries",
@@ -78,21 +78,24 @@ public class Vim : IPackage
 
     public int BackupConfig(int stage)
     {
-        throw new NotImplementedException();
-        
         int statusCode = 0;
         switch (stage)
         {
             case 1:
             {
-                // TODO: Update to read in only the part inside the custom entries -- reverse of the config function
-                string origin = Path.Join(DestinationConfigDirPath, "vimrc");
+                string originFilePath = Path.Join(DestinationConfigDirPath, "vimrc");
                 string destinationDir = Path.Join(Utilities.BackupDirectory, Package.Name());
-                string destination = Path.Join(destinationDir, ConfigFileName);
-                Utilities.RunInReverse([
-                    () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}"),
-                    () => Utilities.BashStack.PushBashCommand($"cp -v {origin} {destination}")
-                ]);
+                string destinationFilePath = Path.Join(destinationDir, ConfigFileName);
+                
+                Utilities.ReadContentBlockInFile(
+                    originFilePath,
+                    out string contentFilePath,
+                    "\" Start custom vim entries",
+                    "\" End custom vim entries"
+                );
+                
+                Directory.CreateDirectory(destinationDir);
+                File.Move(contentFilePath, destinationFilePath, true);
                 break;
             }
             default:

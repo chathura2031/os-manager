@@ -393,7 +393,7 @@ public static class Utilities
             while (!reader.EndOfStream)
             {
                 string line = reader.ReadLine()!;
-                if (!startReplacement && line.Trim().ToLower() == blockStartComment.ToLower())
+                if (!startReplacement && string.Equals(line.Trim(), blockStartComment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     startReplacement = true;
                     // Trigger a new line before the replacement content
@@ -407,7 +407,7 @@ public static class Utilities
                 {
                     writer.WriteLine(line);
                 }
-                else if (startReplacement && line.Trim().ToLower() == blockEndComment.ToLower())
+                else if (startReplacement && string.Equals(line.Trim(), blockEndComment, StringComparison.CurrentCultureIgnoreCase))
                 {
                     AddCustomEntries(writer, addSpaceAbove);
                     customEntriesAdded = true;
@@ -428,6 +428,46 @@ public static class Utilities
             else if (lastLine == null || lastLine.Trim() != "")
             {
                 writer.WriteLine();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Read the content between 2 block start and end comment lines and save it to a new file.
+    /// </summary>
+    /// <param name="filePath">The path to the file with the content to read</param>
+    /// <param name="contentFilePath">The path to the new file with the content that was read in</param>
+    /// <param name="blockStartComment">The comment line which indicates the start of the block</param>
+    /// <param name="blockEndComment">The comment line which indicates the end of the block</param>
+    public static void ReadContentBlockInFile(string filePath, out string contentFilePath, string blockStartComment,
+        string blockEndComment)
+    {
+        contentFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
+        
+        using (StreamReader reader = new StreamReader(filePath))
+        using (StreamWriter writer = new StreamWriter(contentFilePath))
+        {
+            bool startWrite = false;
+            string? lastLine = null;
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine()!;
+                if (!startWrite && string.Equals(line.Trim(), blockStartComment, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    startWrite = true;
+                }
+
+                if (startWrite)
+                {
+                    writer.WriteLine(line);
+                }
+
+                if (startWrite && string.Equals(line.Trim(), blockEndComment, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    startWrite = false;
+                }
+
+                lastLine = line;
             }
         }
     }
