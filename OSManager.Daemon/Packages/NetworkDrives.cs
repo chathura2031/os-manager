@@ -122,46 +122,20 @@ public class NetworkDrives : IPackage
             {
                 string encryptedOrigin = Path.Join(Utilities.EncryptedBackupDirectory, Package.Name());
                 
+                Directory.CreateDirectory(encryptedOrigin);
                 Utilities.CopyFile(Path.Join(Utilities.HomeDirectory, ".smbcredentials"), Path.Join(encryptedOrigin, "smbcredentials"));
                 
                 string fstabFilename = "fstab";
                 string fstabFilePath = Path.Join("/etc", fstabFilename);
-                string tmpFstabFilePath = Path.Join("/tmp", $"osman-{Guid.NewGuid()}.tmp");
                 
-                // Create a new temporary file with just the custom fstab entries
-                using (StreamReader reader = new StreamReader(fstabFilePath))
-                using (StreamWriter writer = new StreamWriter(tmpFstabFilePath))
-                {
-                    bool startWrite = false;
-                    string? lastLine = null;
-                    while (!reader.EndOfStream)
-                    {
-                        string line = reader.ReadLine()!;
-                        if (!startWrite && line == "# Start custom entries")
-                        {
-                            startWrite = true;
-                        }
+                Utilities.ReadContentBlockInFile(
+                    fstabFilePath,
+                    out string contentFilePath,
+                    "# Start custom entries",
+                    "# End custom entries"
+                );
 
-                        if (startWrite)
-                        {
-                            writer.WriteLine(line);
-                        }
-
-                        if (startWrite && line == "# End custom entries")
-                        {
-                            startWrite = false;
-                        }
-
-                        lastLine = line;
-                    }
-
-                    if (lastLine == null || lastLine.Trim() != "")
-                    {
-                        writer.WriteLine();
-                    }
-                }
-
-                File.Move(tmpFstabFilePath, Path.Join(encryptedOrigin, fstabFilename), true);
+                File.Move(contentFilePath, Path.Join(encryptedOrigin, fstabFilename), true);
                 
                 Utilities.BashStack.PushBackupConfigStage(stage + 1, Package.Name());
                 break;
