@@ -15,8 +15,7 @@ public class Vim : BasePackage
     #endregion
     
     #region protected members
-
-    protected override List<Func<string, int>> InstallSteps { get; }
+    protected override List<Func<string, InstallStepReturnData>> InstallSteps { get; }
     protected override List<Func<int>> ConfigureSteps { get; }
     protected override List<Func<int>> BackupConfigurationSteps { get; }
     #endregion
@@ -36,10 +35,13 @@ public class Vim : BasePackage
     #endregion
 
     #region private methods
-    private int AptInstall(string data)
+    private InstallStepReturnData AptInstall(string data)
     {
-        Utilities.BashStack.PushBashCommand("apt install -y vim", true);
-        return 0;
+        return new InstallStepReturnData(
+            0,
+            [() => Utilities.BashStack.PushBashCommand("apt install -y vim", true)],
+            null
+        );
     }
 
     private int CreateVimrcFolder()

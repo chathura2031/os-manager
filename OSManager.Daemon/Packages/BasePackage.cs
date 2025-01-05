@@ -13,7 +13,7 @@ public abstract class BasePackage : IPackage
     #endregion
 
     #region protected members
-    protected abstract List<Func<string, int>> InstallSteps { get; }
+    protected abstract List<Func<string, InstallStepReturnData>> InstallSteps { get; }
     protected abstract List<Func<int>> ConfigureSteps { get; }
     protected abstract List<Func<int>> BackupConfigurationSteps { get; }
     protected string BackupDirPath => Path.Join(Utilities.BackupDirectory, Package.Name());
@@ -32,12 +32,36 @@ public abstract class BasePackage : IPackage
             throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of installation.");
         }
 
-        if (stage < InstallSteps.Count + 1)
+        int statusCode = 0;
+        string? dataOut = null;
+        bool hasNextStage = stage < InstallSteps.Count + 1;
+        Action[] bashCommands = [];
+        if (stage == 1)
         {
-            Utilities.BashStack.PushInstallStage(stage + 1, Package.Name());
+            statusCode = this.InstallDependencies();
+        }
+        else
+        {
+            InstallStepReturnData result = InstallSteps[stage - 2].Invoke(data);
+            statusCode = result.StatusCode;
+            dataOut = result.OutgoingData;
+            bashCommands = result.BashCommands;
         }
         
-        return stage == 1 ? this.InstallDependencies() : InstallSteps[stage - 2].Invoke(data);
+        if (hasNextStage && statusCode == 0)
+        {
+            Action[] tmp = new Action[bashCommands.Length + 1];
+            tmp[^1] = () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dataOut);
+            bashCommands.CopyTo(tmp, 0);
+            bashCommands = tmp;
+        }
+
+        if (bashCommands.Length > 0)
+        {
+            Utilities.RunInReverse(bashCommands);
+        }
+
+        return statusCode;
     }
 
     public int Configure(int stage)
