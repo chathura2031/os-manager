@@ -1,107 +1,108 @@
 using OSManager.Core.Enums;
-using OSManager.Core.Extensions;
-using OSManager.Daemon.Extensions;
 
 namespace OSManager.Daemon.Packages;
 
-public class Vim : IPackage
+public class Vim : BasePackage
 {
+    #region public static members
     public static readonly Vim Instance = new();
+    #endregion
 
-    public Package Package { get; } = Package.Vim;
-
-    public List<IPackage> Dependencies { get; } = [];
-
-    public List<IPackage> OptionalExtras { get; } = [];
-
-    // The name of the config file in the package's directory
-    private const string ConfigFileName = "vimrc";
-
-    private const string DestinationConfigDirPath = "/etc/vim";
+    #region public members
+    public override Package Package { get; } = Package.Vim;
+    public override List<IPackage> Dependencies { get; } = [];
+    public override List<IPackage> OptionalExtras { get; } = [];
+    #endregion
     
-    public int Install(int stage, string data)
-    {
-        int statusCode = 0;
-        switch (stage)
-        {
-            case 1:
-            {
-                Utilities.BashStack.PushInstallStage(stage + 1, Package.Name());
-                this.InstallDependencies();
-                break;
-            }
-            case 2:
-            {
-                Utilities.BashStack.PushBashCommand("apt install -y vim", true);
-                break;
-            }
-            default:
-                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of installation.");
-        }
+    #region protected members
 
-        return statusCode;
+    protected override List<Func<string, int>> InstallSteps { get; }
+    protected override List<Func<int>> ConfigureSteps { get; }
+    protected override List<Func<int>> BackupConfigurationSteps { get; }
+    #endregion
+
+    #region private members
+    private const string ConfigFileName = "vimrc";
+    private const string DestinationConfigDirPath = "/etc/vim";
+    #endregion
+
+    #region ctor
+    private Vim()
+    {
+        InstallSteps = [AptInstall];
+        ConfigureSteps = [CreateVimrcFolder, ConfigureVimrc];
+        BackupConfigurationSteps = [BackupVimrc];
+    }
+    #endregion
+
+    #region private methods
+    private int AptInstall(string data)
+    {
+        Utilities.BashStack.PushBashCommand("apt install -y vim", true);
+        return 0;
     }
 
-    public int Configure(int stage)
+    private int CreateVimrcFolder()
     {
-        int statusCode = 0;
-        switch (stage)
+        if (!Directory.Exists(DestinationConfigDirPath))
         {
-            case 1:
-            {
-                string templatePath = Path.Join(Utilities.BackupDirectory, Package.Name(), ConfigFileName);
-                string destinationDir = DestinationConfigDirPath;
-                string destinationFilePath = Path.Join(destinationDir, "vimrc");
-                
-                IEnumerable<string> linesToAdd = File.ReadLines(templatePath);
-                
-                Utilities.ReplaceContentBlockInFile(
-                    destinationFilePath,
-                    out string modifiedFilePath,
-                    linesToAdd,
-                    "\" Start custom vim entries",
-                    "\" End custom vim entries"
-                );
-                
-                Utilities.RunInReverse([
-                    () => Utilities.BashStack.PushBashCommand($"mkdir -p {destinationDir}", true),
-                    () => Utilities.BashStack.PushBashCommand($"mv -v {modifiedFilePath} {destinationFilePath }", true)
-                ]);
-                break;
-            }
-            default:
-                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of configuration.");
+            Utilities.BashStack.PushBashCommand($"mkdir -p {DestinationConfigDirPath}", true);
         }
         
-        return statusCode;
+        return 0;
     }
 
-    public int BackupConfig(int stage)
+    private int ConfigureVimrc()
     {
-        int statusCode = 0;
-        switch (stage)
+        if (!Directory.Exists(DestinationConfigDirPath))
         {
-            case 1:
-            {
-                string originFilePath = Path.Join(DestinationConfigDirPath, "vimrc");
-                string destinationDir = Path.Join(Utilities.BackupDirectory, Package.Name());
-                string destinationFilePath = Path.Join(destinationDir, ConfigFileName);
-                
-                Utilities.ReadContentBlockInFile(
-                    originFilePath,
-                    out string contentFilePath,
-                    "\" Start custom vim entries",
-                    "\" End custom vim entries"
-                );
-                
-                Directory.CreateDirectory(destinationDir);
-                File.Move(contentFilePath, destinationFilePath, true);
-                break;
-            }
-            default:
-                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of configuration backup.");
+            throw new Exception($"{DestinationConfigDirPath} does not exist");
         }
         
-        return statusCode;
+        string templateFilePath = Path.Join(BackupDirPath, ConfigFileName);
+        string destinationFilePath = Path.Join(DestinationConfigDirPath, ConfigFileName);
+
+        // Nothing to do if the vimrc file doesn't exist
+        if (!File.Exists(templateFilePath))
+        {
+            return 0;
+        }
+        
+        IEnumerable<string> linesToAdd = File.ReadLines(templateFilePath);
+        
+        Utilities.ReplaceContentBlockInFile(
+            destinationFilePath,
+            out string modifiedFilePath,
+            linesToAdd,
+            "\" Start custom vim entries",
+            "\" End custom vim entries"
+        );
+
+        Utilities.BashStack.PushBashCommand($"mv -v {modifiedFilePath} {destinationFilePath}", true);
+        return 0;
     }
+
+    private int BackupVimrc()
+    {
+        string sourceFilePath = Path.Join(DestinationConfigDirPath, ConfigFileName);
+        if (!File.Exists(sourceFilePath))
+        {
+            return 0;
+        }
+        
+        string destinationFilePath = Path.Join(BackupDirPath, ConfigFileName);
+        
+        Utilities.ReadContentBlockInFile(
+            sourceFilePath,
+            out string contentFilePath,
+            "\" Start custom vim entries",
+            "\" End custom vim entries"
+        );
+        
+        Directory.CreateDirectory(BackupDirPath);
+        File.Move(contentFilePath, destinationFilePath, true);
+
+        return 0;
+    }
+    #endregion
 }
