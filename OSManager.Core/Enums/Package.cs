@@ -35,5 +35,8 @@ public enum Package
     Qdbus,
     
     [Name("docker"), PrettyName("Docker")]
-    Docker
+    Docker,
+    
+    [Name("codium"), PrettyName("Codium")]
+    Codium
 }

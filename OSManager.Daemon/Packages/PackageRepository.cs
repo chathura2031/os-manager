@@ -17,6 +17,7 @@ public static class PackageRepository
         Yakuake.Instance,
         Qdbus.Instance,
         Docker.Instance,
+        Codium.Instance,
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();
