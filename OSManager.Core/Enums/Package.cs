@@ -32,5 +32,8 @@ public enum Package
     Yakuake,
     
     [Name("qdbus"), PrettyName("QDBus")]
-    Qdbus
+    Qdbus,
+    
+    [Name("docker"), PrettyName("Docker")]
+    Docker
 }
