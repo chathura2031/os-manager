@@ -47,18 +47,21 @@ public abstract class BasePackage : IPackage
             dataOut = result.OutgoingData;
             bashCommands = result.BashCommands;
         }
-        
-        if (hasNextStage && statusCode == 0)
-        {
-            Action[] tmp = new Action[bashCommands.Length + 1];
-            tmp[^1] = () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dataOut);
-            bashCommands.CopyTo(tmp, 0);
-            bashCommands = tmp;
-        }
 
-        if (bashCommands.Length > 0)
+        if (statusCode == 0)
         {
-            Utilities.RunInReverse(bashCommands);
+            if (hasNextStage)
+            {
+                Action[] tmp = new Action[bashCommands.Length + 1];
+                tmp[^1] = () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dataOut);
+                bashCommands.CopyTo(tmp, 0);
+                bashCommands = tmp;
+            }
+
+            if (bashCommands.Length > 0)
+            {
+                Utilities.RunInReverse(bashCommands);
+            }
         }
 
         return statusCode;
