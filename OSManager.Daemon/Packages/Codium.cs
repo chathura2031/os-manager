@@ -23,8 +23,8 @@ public class Codium : BasePackage
     #region constructors
     private Codium()
     {
-        InstallSteps = [SetupAndInstall, InstallExtensions];
-        ConfigureSteps = [];
+        InstallSteps = [SetupAndInstall];
+        ConfigureSteps = [InstallExtensions];
         BackupConfigurationSteps = [];
     }
     #endregion
@@ -46,13 +46,10 @@ public class Codium : BasePackage
         );
     }
 
-    private InstallStepReturnData InstallExtensions(string data)
+    private int InstallExtensions()
     {
-        return new InstallStepReturnData(
-            0,
-            [() => Utilities.BashStack.PushBashCommand("codium --install-extension vscodevim.vim")],
-            null
-        );
+        Utilities.BashStack.PushBashCommand("codium --install-extension vscodevim.vim");
+        return 0;
     }
     #endregion
 }
