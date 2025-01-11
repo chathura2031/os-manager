@@ -22,7 +22,7 @@ public class Docker : BasePackage
     protected override List<Func<int>> BackupConfigurationSteps { get; }
     #endregion
 
-    #region ctor
+    #region constructors
     private Docker()
     {
         // Instructions from: https://docs.docker.com/engine/install/debian/#install-from-a-package
@@ -33,7 +33,7 @@ public class Docker : BasePackage
             DownloadAndInstallDeb("docker-buildx-plugin_0.19.3-1~debian.12~bookworm_amd64.deb", "docker-buildx-plugin.deb"), DeleteFile,
             DownloadAndInstallDeb("docker-compose-plugin_2.32.1-1~debian.12~bookworm_amd64.deb", "docker-compose-plugin.deb"), DeleteFile
         ];
-        ConfigureSteps = [];
+        ConfigureSteps = [AddUserToDockerGroup];
         BackupConfigurationSteps = [];
     }
     #endregion
@@ -71,6 +71,17 @@ public class Docker : BasePackage
     {
         File.Delete(filePath);
         return new InstallStepReturnData(0, [], null);
+    }
+
+    private int AddUserToDockerGroup()
+    {
+        Utilities.RunInReverse([
+            // () => Utilities.BashStack.PushBashCommand("groupadd docker", true),
+            () => Utilities.BashStack.PushBashCommand("usermod -aG docker $USER", true),
+            () => Utilities.BashStack.PushBashCommand("newgrp docker")
+        ]);
+
+        return 0;
     }
     #endregion
 }
