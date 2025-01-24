@@ -22,6 +22,8 @@ public static class Utilities
     public static string EncryptedBackupDirectory => Path.Join(WorkingDirectory, "os-config-secrets");
     
     public static string EncryptorPath => Path.Join(EncryptedBackupDirectory, "file-encryptor", "Encryption.FileEncryptor");
+
+    public static string UserScriptPath => "/usr/local/bin";
     
     public static string BaseStackPath { get; private set; }
     
