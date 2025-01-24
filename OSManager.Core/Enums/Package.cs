@@ -38,5 +38,8 @@ public enum Package
     Docker,
     
     [Name("codium"), PrettyName("Codium")]
-    Codium
+    Codium,
+    
+    [Name("rider"), PrettyName("Rider")]
+    Rider
 }

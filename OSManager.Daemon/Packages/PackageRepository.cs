@@ -18,6 +18,7 @@ public static class PackageRepository
         Qdbus.Instance,
         Docker.Instance,
         Codium.Instance,
+        Rider.Instance,
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

@@ -12,6 +12,7 @@ public class Vim : BasePackage
     public override Package Package { get; } = Package.Vim;
     public override List<IPackage> Dependencies { get; } = [];
     public override List<IPackage> OptionalExtras { get; } = [];
+    public readonly string ConfigFilePath = Path.Join(DestinationConfigDirPath, ConfigFileName);
     #endregion
     
     #region protected members
@@ -62,7 +63,6 @@ public class Vim : BasePackage
         }
         
         string templateFilePath = Path.Join(BackupDirPath, ConfigFileName);
-        string destinationFilePath = Path.Join(DestinationConfigDirPath, ConfigFileName);
 
         // Nothing to do if the vimrc file doesn't exist
         if (!File.Exists(templateFilePath))
@@ -73,21 +73,20 @@ public class Vim : BasePackage
         IEnumerable<string> linesToAdd = File.ReadLines(templateFilePath);
         
         Utilities.ReplaceContentBlockInFile(
-            destinationFilePath,
+            ConfigFilePath,
             out string modifiedFilePath,
             linesToAdd,
             "\" Start custom vim entries",
             "\" End custom vim entries"
         );
 
-        Utilities.BashStack.PushBashCommand($"mv -v {modifiedFilePath} {destinationFilePath}", true);
+        Utilities.BashStack.PushBashCommand($"mv -v {modifiedFilePath} {ConfigFilePath}", true);
         return 0;
     }
 
     private int BackupVimrc()
     {
-        string sourceFilePath = Path.Join(DestinationConfigDirPath, ConfigFileName);
-        if (!File.Exists(sourceFilePath))
+        if (!File.Exists(ConfigFilePath))
         {
             return 0;
         }
@@ -95,7 +94,7 @@ public class Vim : BasePackage
         string destinationFilePath = Path.Join(BackupDirPath, ConfigFileName);
         
         Utilities.ReadContentBlockInFile(
-            sourceFilePath,
+            ConfigFilePath,
             out string contentFilePath,
             "\" Start custom vim entries",
             "\" End custom vim entries"
