@@ -19,6 +19,7 @@ public static class PackageRepository
         Docker.Instance,
         Codium.Instance,
         Rider.Instance,
+        Qalculate.Instance, 
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

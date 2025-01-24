@@ -41,5 +41,8 @@ public enum Package
     Codium,
     
     [Name("rider"), PrettyName("Rider")]
-    Rider
+    Rider,
+    
+    [Name("qalculate"), PrettyName("Qalculate")]
+    Qalculate,
 }
