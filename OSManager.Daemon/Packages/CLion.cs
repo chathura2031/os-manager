@@ -33,7 +33,7 @@ public class CLion : BasePackage
                                          Type=Application
                                          Name=JetBrains CLion
                                          Icon=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/clion.svg
-                                         Exec=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/clion.sh %f
+                                         Exec=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/clion %f
                                          Comment=A cross-platform IDE for C and C++
                                          Categories=Development;IDE;
                                          Terminal=false

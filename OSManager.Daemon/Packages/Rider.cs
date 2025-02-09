@@ -33,7 +33,7 @@ public class Rider : BasePackage
                                          Type=Application
                                          Name=JetBrains Rider
                                          Icon=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/rider.svg
-                                         Exec=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/rider.sh %f
+                                         Exec=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/rider %f
                                          Comment=A cross-platform IDE for .NET
                                          Categories=Development;IDE;
                                          Terminal=false
