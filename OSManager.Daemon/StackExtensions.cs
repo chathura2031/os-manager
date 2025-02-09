@@ -29,6 +29,16 @@ public static class StackExtensions
     }
 
     /// <summary>
+    /// Push a bash command and store the output in the program stack
+    /// </summary>
+    /// <param name="stack">A reference to the stack</param>
+    /// <param name="command">The bash command to run</param>
+    public static void PushBashCommandOutputToProgramStack(this FatStack stack, string command)
+    {
+        PushBashCommand(stack, $"{command} &> {Utilities.ProgramStack.Path}.tmp; ./{Utilities.SlavePath} pushstack --file {Utilities.ProgramStack.Path}.tmp", false);
+    }
+
+    /// <summary>
     /// Push a bash command to install a specific package
     /// </summary>
     /// <param name="stack">A reference to a stack</param>
