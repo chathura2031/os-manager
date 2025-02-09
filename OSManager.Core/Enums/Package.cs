@@ -43,6 +43,9 @@ public enum Package
     [Name("rider"), PrettyName("Rider")]
     Rider,
     
+    [Name("clion"), PrettyName("CLion")]
+    CLion,
+    
     [Name("qalculate"), PrettyName("Qalculate")]
     Qalculate,
 }

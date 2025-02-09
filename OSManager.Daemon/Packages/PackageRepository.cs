@@ -19,6 +19,7 @@ public static class PackageRepository
         Docker.Instance,
         Codium.Instance,
         Rider.Instance,
+        CLion.Instance, 
         Qalculate.Instance, 
     ];
 
