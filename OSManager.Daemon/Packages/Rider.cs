@@ -29,6 +29,7 @@ public class Rider : BasePackage
     private string Version => "2024.3.5";
     private string DesktopFileContent => $"""
                                          [Desktop Entry]
+                                         Version=1.0
                                          Type=Application
                                          Name=JetBrains Rider
                                          Icon=/usr/share/jetbrains/{Package.Name()}-{Version}/bin/rider.svg
@@ -58,8 +59,11 @@ public class Rider : BasePackage
 
         Console.WriteLine($"Downloading package...");
         int statusCode = Utilities.DownloadFromUrl(
-            $"https://download.jetbrains.com/rider/JetBrains.Rider-{Version}.tar.gz", $"{Package.Name()}.tar.gz",
-            out string filePath, downloadDirectory);
+            $"https://download.jetbrains.com/rider/JetBrains.Rider-{Version}.tar.gz",
+            $"{Package.Name()}.tar.gz",
+            out string filePath,
+            downloadDirectory
+        );
         
         Console.WriteLine("Extracting package...");
         return new InstallStepReturnData(
