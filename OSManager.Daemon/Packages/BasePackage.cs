@@ -36,11 +36,7 @@ public abstract class BasePackage : IPackage
         string? dataOut = null;
         bool hasNextStage = stage < InstallSteps.Count + 1;
         Action[] bashCommands = [];
-        if (stage == 1)
-        {
-            statusCode = this.InstallDependencies();
-        }
-        else
+        if (stage > 1)
         {
             InstallStepReturnData result = InstallSteps[stage - 2].Invoke(data);
             statusCode = result.StatusCode;
@@ -62,6 +58,11 @@ public abstract class BasePackage : IPackage
             {
                 Utilities.RunInReverse(bashCommands);
             }
+        }
+        
+        if (stage == 1)
+        {
+            statusCode = this.InstallDependencies();
         }
 
         return statusCode;
