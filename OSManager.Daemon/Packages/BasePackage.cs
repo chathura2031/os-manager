@@ -38,6 +38,7 @@ public abstract class BasePackage : IPackage
         Action[] bashCommands = [];
         if (stage > 1)
         {
+            Console.WriteLine($"Running {Package.PrettyName()} installation step {stage}...");
             InstallStepReturnData result = InstallSteps[stage - 2].Invoke(data);
             statusCode = result.StatusCode;
             dataOut = result.OutgoingData;
@@ -62,6 +63,7 @@ public abstract class BasePackage : IPackage
         
         if (stage == 1)
         {
+            Console.WriteLine($"Installing dependencies for {Package.PrettyName()}...");
             statusCode = this.InstallDependencies();
         }
 
