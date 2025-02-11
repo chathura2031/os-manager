@@ -21,6 +21,8 @@ public static class PackageRepository
         Rider.Instance,
         CLion.Instance, 
         Qalculate.Instance, 
+        Element.Instance, 
+        AptTransportHttps.Instance, 
     ];
 
     private static readonly Dictionary<Package, IPackage> PackageLookup = new();

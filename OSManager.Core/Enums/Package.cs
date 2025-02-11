@@ -48,4 +48,10 @@ public enum Package
     
     [Name("qalculate"), PrettyName("Qalculate")]
     Qalculate,
+    
+    [Name("element"), PrettyName("Element")]
+    Element,
+    
+    [Name("apt-transport-https"), PrettyName("APT Transport HTTPS")]
+    AptTransportHttps,
 }

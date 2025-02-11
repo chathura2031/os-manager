@@ -35,6 +35,10 @@ public class UpdateAndUpgrade : BasePackage
     }
     #endregion
     
+    #region public methods
+    public void ResetLastRun() => _lastRun = null;
+    #endregion
+    
     #region private methods
     private InstallStepReturnData AptUpdateAndUpgrade(string data)
     {
