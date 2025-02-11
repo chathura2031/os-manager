@@ -18,6 +18,7 @@ public abstract class BasePackage : IPackage
     protected abstract List<Func<int>> BackupConfigurationSteps { get; }
     protected string BackupDirPath => Path.Join(Utilities.BackupDirectory, Package.Name());
     protected string EncryptedBackupDirPath => Path.Join(Utilities.EncryptedBackupDirectory, Package.Name());
+    protected List<Package> RunPackagesPostStep = [];
     #endregion
     
     #region public methods
@@ -35,29 +36,35 @@ public abstract class BasePackage : IPackage
         int statusCode = 0;
         string? dataOut = null;
         bool hasNextStage = stage < InstallSteps.Count + 1;
-        Action[] bashCommands = [];
+        List<Action> bashCommands = [];
         if (stage > 1)
         {
-            Console.WriteLine($"Running {Package.PrettyName()} installation step {stage}...");
+            Console.WriteLine($"Running {Package.PrettyName()} installation step {stage - 1}...");
             InstallStepReturnData result = InstallSteps[stage - 2].Invoke(data);
             statusCode = result.StatusCode;
             dataOut = result.OutgoingData;
-            bashCommands = result.BashCommands;
+            bashCommands = new(result.BashCommands);
         }
 
         if (statusCode == 0)
         {
-            if (hasNextStage)
+            if (RunPackagesPostStep.Count > 0)
             {
-                Action[] tmp = new Action[bashCommands.Length + 1];
-                tmp[^1] = () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dataOut);
-                bashCommands.CopyTo(tmp, 0);
-                bashCommands = tmp;
+                foreach (Package package in RunPackagesPostStep)
+                {
+                    bashCommands.Add(() => Utilities.BashStack.PushInstallStage(1, package.Name(), null));
+                }
+                RunPackagesPostStep = [];
             }
 
-            if (bashCommands.Length > 0)
+            if (hasNextStage)
             {
-                Utilities.RunInReverse(bashCommands);
+                bashCommands.Add(() => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dataOut));
+            }
+
+            if (bashCommands.Count > 0)
+            {
+                Utilities.RunInReverse(bashCommands.ToArray());
             }
         }
         
