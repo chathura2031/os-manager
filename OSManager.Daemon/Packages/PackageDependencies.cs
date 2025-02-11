@@ -26,7 +26,10 @@ public class PackageDependencies : IPackage
             case 1:
                 // Update sources and upgrade packages
                 Utilities.BashStack.PushInstallStage(stage + 1, Package.Name(), dependencyName);
-                UpdateAndUpgrade.Instance.Install(1, "");
+                if (package != UpdateAndUpgrade.Instance)
+                {
+                    UpdateAndUpgrade.Instance.Install(1, "");
+                }
                 break;
             case 2:
                 // Check whether each dependency has been installed

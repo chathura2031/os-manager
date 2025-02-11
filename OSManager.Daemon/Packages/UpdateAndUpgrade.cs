@@ -4,50 +4,58 @@ using OSManager.Core.Extensions;
 
 namespace OSManager.Daemon.Packages;
 
-public class UpdateAndUpgrade : IPackage
+public class UpdateAndUpgrade : BasePackage
 {
+    #region public static members
     public static readonly UpdateAndUpgrade Instance = new();
-
-    public Package Package { get; } = Package.INTERNAL_UpdateAndUpgrade;
+    #endregion
     
-    public List<IPackage> Dependencies { get; } = [];
+    #region public members
+    public override Package Package { get; } = Package.INTERNAL_UpdateAndUpgrade;
+    public override List<IPackage> Dependencies { get; } = [];
+    public override List<IPackage> OptionalExtras { get; } = [];
+    #endregion
     
-    public List<IPackage> OptionalExtras { get; } = [];
+    #region protected members
+    protected override List<Func<string, InstallStepReturnData>> InstallSteps { get; }
+    protected override List<Func<int>> ConfigureSteps { get; }
+    protected override List<Func<int>> BackupConfigurationSteps { get; }
+    #endregion
     
-    private DateTime? _lastRun;
-
-    public int Install(int stage, string data)
+    #region private members
+    private DateTime? _lastRun = null;
+    #endregion
+    
+    #region constructors
+    private UpdateAndUpgrade()
     {
-        int statusCode = 0;
-        switch (stage)
-        {
-            case 1:
-                if (_lastRun == null || DateTime.Now - _lastRun >= new TimeSpan(0, 5, 0))
-                {
-                    Utilities.RunInReverse([
-                        () => Utilities.BashStack.PushBashCommand("apt update", true),
-                        () => Utilities.BashStack.PushBashCommand("apt upgrade -y", true),
-                        () => Utilities.BashStack.PushBashCommand("apt autoremove -y", true),
-                        () => Utilities.BashStack.PushInstallStage(stage + 1, Package.Name())
-                    ]);
-                }
-                break;
-            case 2:
-                _lastRun = DateTime.Now;
-                break;
-            default:
-                throw new ArgumentException($"{Package.PrettyName()} does not have {stage} stages of installation.");
-        }
-        return statusCode;
+        InstallSteps = [AptUpdateAndUpgrade, SaveLastRunTime];
+        ConfigureSteps = [];
+        BackupConfigurationSteps = [];
+    }
+    #endregion
+    
+    #region private methods
+    private InstallStepReturnData AptUpdateAndUpgrade(string data)
+    {
+        Action[] commands = [
+             () => Utilities.BashStack.PushBashCommand("apt update", true),
+             () => Utilities.BashStack.PushBashCommand("apt upgrade -y", true),
+             () => Utilities.BashStack.PushBashCommand("apt autoremove -y", true)
+        ];
+
+         return new InstallStepReturnData(
+             0,
+             _lastRun == null || DateTime.Now - _lastRun >= new TimeSpan(0, 5, 0) ? commands : [],
+             null
+         );
     }
 
-    public int Configure(int stage)
+    private InstallStepReturnData SaveLastRunTime(string data)
     {
-        return 0;
-    }
+         _lastRun = DateTime.Now;
 
-    public int BackupConfig(int stage)
-    {
-        return 0;
+         return new InstallStepReturnData(0, [], null);
     }
+    #endregion
 }
